@@ -1,0 +1,7 @@
+rho,disruptions,A1_fully_inert_pct,A1_dev_inert_pct,A1_unserved_mean,A2_fully_inert_pct,A2_dev_inert_pct,A2_unserved_mean,A2_dev_monotone,A2_cost_of_stability_min,ci95_method
+0.45,121,100.0,100.0,0.0,95.86776859504133,95.86776859504133,0.0,121/121,0.7355371900826446,NOT_COMPUTED_IN_R1b — disruption-IID inference removed; superseded by R5 cluster-level inference (REQ-10)
+0.55,96,100.0,100.0,0.0,93.75,93.75,0.0,96/96,1.0729166666666667,NOT_COMPUTED_IN_R1b — disruption-IID inference removed; superseded by R5 cluster-level inference (REQ-10)
+0.65,85,100.0,100.0,0.011764705882352941,90.58823529411765,90.58823529411765,0.011764705882352941,85/85,1.9764705882352942,NOT_COMPUTED_IN_R1b — disruption-IID inference removed; superseded by R5 cluster-level inference (REQ-10)
+0.75,79,96.20253164556962,96.20253164556962,0.0759493670886076,0.0,0.0,0.0759493670886076,79/79,642.9240506329114,NOT_COMPUTED_IN_R1b — disruption-IID inference removed; superseded by R5 cluster-level inference (REQ-10)
+0.85,72,83.33333333333333,83.33333333333333,0.3611111111111111,0.0,0.0,0.3611111111111111,72/72,202.88888888888889,NOT_COMPUTED_IN_R1b — disruption-IID inference removed; superseded by R5 cluster-level inference (REQ-10)
+0.95,65,92.3076923076923,92.3076923076923,0.3384615384615385,0.0,0.0,0.3384615384615385,65/65,126.52307692307693,NOT_COMPUTED_IN_R1b — disruption-IID inference removed; superseded by R5 cluster-level inference (REQ-10)

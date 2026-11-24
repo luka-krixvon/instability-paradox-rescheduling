@@ -1,0 +1,236 @@
+{
+  "bootstrap": {
+    "ci_level": 0.95,
+    "draw_rule": "draw one length-five seed-index vector per replicate and reuse it in all six rho strata",
+    "interpretation": "descriptive_sensitivity_not_population_inference",
+    "n_resamples": 10000,
+    "pool_estimator": "equal-weight mean of the six rho-stratum means",
+    "pooled_p_value": false,
+    "resample_unit": "shared generation-seed vector",
+    "rng": "numpy.random.Generator(PCG64)",
+    "rng_seed": 20260730,
+    "seed_index_matrix_sha256": "59955a2d7e9445b60947cd405d43de5b89d93068b51fd0be2c00c552eed1ba32",
+    "shared_seed_indices_across_rho": true,
+    "stratum_estimator": "mean of resampled scenario effects"
+  },
+  "design_manifest_sha256": "885601ea87c5f6c9292b9886edb87b11f58991623a2ab195c97b6da8d7c5f40b",
+  "dynamic_coverage": {
+    "actual_raw_rows": 6216,
+    "dynamic_disruptions": 518,
+    "expected_raw_rows": 6216,
+    "scenarios": 30
+  },
+  "dynamic_disruptions_by_scenario": [
+    {
+      "n_eligible_disruptions": 24,
+      "rho": 0.45,
+      "seed": 1
+    },
+    {
+      "n_eligible_disruptions": 23,
+      "rho": 0.45,
+      "seed": 2
+    },
+    {
+      "n_eligible_disruptions": 26,
+      "rho": 0.45,
+      "seed": 3
+    },
+    {
+      "n_eligible_disruptions": 24,
+      "rho": 0.45,
+      "seed": 4
+    },
+    {
+      "n_eligible_disruptions": 24,
+      "rho": 0.45,
+      "seed": 5
+    },
+    {
+      "n_eligible_disruptions": 19,
+      "rho": 0.55,
+      "seed": 1
+    },
+    {
+      "n_eligible_disruptions": 19,
+      "rho": 0.55,
+      "seed": 2
+    },
+    {
+      "n_eligible_disruptions": 21,
+      "rho": 0.55,
+      "seed": 3
+    },
+    {
+      "n_eligible_disruptions": 19,
+      "rho": 0.55,
+      "seed": 4
+    },
+    {
+      "n_eligible_disruptions": 18,
+      "rho": 0.55,
+      "seed": 5
+    },
+    {
+      "n_eligible_disruptions": 17,
+      "rho": 0.65,
+      "seed": 1
+    },
+    {
+      "n_eligible_disruptions": 17,
+      "rho": 0.65,
+      "seed": 2
+    },
+    {
+      "n_eligible_disruptions": 19,
+      "rho": 0.65,
+      "seed": 3
+    },
+    {
+      "n_eligible_disruptions": 16,
+      "rho": 0.65,
+      "seed": 4
+    },
+    {
+      "n_eligible_disruptions": 16,
+      "rho": 0.65,
+      "seed": 5
+    },
+    {
+      "n_eligible_disruptions": 16,
+      "rho": 0.75,
+      "seed": 1
+    },
+    {
+      "n_eligible_disruptions": 16,
+      "rho": 0.75,
+      "seed": 2
+    },
+    {
+      "n_eligible_disruptions": 17,
+      "rho": 0.75,
+      "seed": 3
+    },
+    {
+      "n_eligible_disruptions": 17,
+      "rho": 0.75,
+      "seed": 4
+    },
+    {
+      "n_eligible_disruptions": 13,
+      "rho": 0.75,
+      "seed": 5
+    },
+    {
+      "n_eligible_disruptions": 14,
+      "rho": 0.85,
+      "seed": 1
+    },
+    {
+      "n_eligible_disruptions": 15,
+      "rho": 0.85,
+      "seed": 2
+    },
+    {
+      "n_eligible_disruptions": 15,
+      "rho": 0.85,
+      "seed": 3
+    },
+    {
+      "n_eligible_disruptions": 15,
+      "rho": 0.85,
+      "seed": 4
+    },
+    {
+      "n_eligible_disruptions": 13,
+      "rho": 0.85,
+      "seed": 5
+    },
+    {
+      "n_eligible_disruptions": 11,
+      "rho": 0.95,
+      "seed": 1
+    },
+    {
+      "n_eligible_disruptions": 14,
+      "rho": 0.95,
+      "seed": 2
+    },
+    {
+      "n_eligible_disruptions": 14,
+      "rho": 0.95,
+      "seed": 3
+    },
+    {
+      "n_eligible_disruptions": 13,
+      "rho": 0.95,
+      "seed": 4
+    },
+    {
+      "n_eligible_disruptions": 13,
+      "rho": 0.95,
+      "seed": 5
+    }
+  ],
+  "formal": true,
+  "holm": {
+    "enabled": false,
+    "registration": null
+  },
+  "input_hashes": {
+    "R1b/e4_raw.csv": "532d1ccf826101ff128abc8f8eb18ef8f9d9611b442fd808a23f273f11e8e2c5",
+    "experiments/journal_p0/S_rho045_n16_s1.csv": "7fb827acb5e4baf68a8b773cd9729b4d5806cf988edba791360c15a10c9d50c4",
+    "experiments/journal_p0/S_rho045_n16_s2.csv": "6186045969626774e50e7ba8d903f47321771316328486378a61d9b4eaf6937d",
+    "experiments/journal_p0/S_rho045_n16_s3.csv": "1cddcda72f77da6a198f6417146684597b516b0155cf2d35e9a11101152b2bc9",
+    "experiments/journal_p0/S_rho045_n16_s4.csv": "3c76c9ea8a6163f796cdadb896183b780410ea11d3c5d9f7c72f91bb91dbb69c",
+    "experiments/journal_p0/S_rho045_n16_s5.csv": "fe10f5f7268d2db3b835c6255f45e7bc653bc8365a5895bb8fa75ebb2486c9ed",
+    "experiments/journal_p0/S_rho055_n16_s1.csv": "3cb5b55e01f72cd1aedc56dd2d3787ea3db4b57d7eca4cf2b7adb82533a6d630",
+    "experiments/journal_p0/S_rho055_n16_s2.csv": "3ef05d6939f1d232a34e02c9e1e9eb8701b11d8996e41e84a2bea782647db8b8",
+    "experiments/journal_p0/S_rho055_n16_s3.csv": "61892d97c70088652d583d7edd2e248a60c4ffe1e673c9452ca6b2833453d57e",
+    "experiments/journal_p0/S_rho055_n16_s4.csv": "69335686048f067236bc206a01312d1fc7138649752606bfa05368ea5e159f7a",
+    "experiments/journal_p0/S_rho055_n16_s5.csv": "978976ddfe2cc3bfd103b9904f43765ecd1060c7632708a7affd69a5e887e145",
+    "experiments/journal_p0/S_rho065_n16_s1.csv": "016ee61f0ee705fbeb586d880ca0b522552699b752df3d299d37b1d8c2a2f816",
+    "experiments/journal_p0/S_rho065_n16_s2.csv": "7c1c39167759b9647ad4941314b608405eb9d376b054911886b0c382f5e894ca",
+    "experiments/journal_p0/S_rho065_n16_s3.csv": "886fa8c151aaa9b3d99a344b22163ffc42fc49c1ba957044fece853f9cf9285b",
+    "experiments/journal_p0/S_rho065_n16_s4.csv": "3651f06a33da759a7219f715b0e5a956877738430b6d6030c6b239baa9b7a910",
+    "experiments/journal_p0/S_rho065_n16_s5.csv": "8e680ef55c418863695f3b12e862b5d231ee02bbfb9198faeeeccc870f2b38d9",
+    "experiments/journal_p0/S_rho075_n16_s1.csv": "9f8c9e96e5f8d19ea76578e4aebd6bf27e5310048e8bcf9d0f705c43e32327e3",
+    "experiments/journal_p0/S_rho075_n16_s2.csv": "9a5ddb2c6948d4ffc7eb416f0594b39898b4dc68535466f6d134900c25ecea18",
+    "experiments/journal_p0/S_rho075_n16_s3.csv": "9e80c318a5adf9bc49de6bd81498e74918f7259cf709f3b4231c6c1ae9f7f1de",
+    "experiments/journal_p0/S_rho075_n16_s4.csv": "378d69d450195d9ec193be6b484d1fb318529a5195e92f9ee03809639c89934e",
+    "experiments/journal_p0/S_rho075_n16_s5.csv": "01c0223fb6ce80a5ab7252df8e7503f84ed05ae10d9bc2b4c96cd86b8f6017d1",
+    "experiments/journal_p0/S_rho085_n16_s1.csv": "9919cca3b1a35704e6d0c63c95700cf855e2b72c395960068b376f2edde19b10",
+    "experiments/journal_p0/S_rho085_n16_s2.csv": "a3154310e6882aabc13c5cf86dbee9be9e4235cc3595677e3ad0dabed95f32f6",
+    "experiments/journal_p0/S_rho085_n16_s3.csv": "bd0fd6e8080da51241fc7fc4177f2aa873afe7d2eb137c9a3da4d2b97f3bd4a0",
+    "experiments/journal_p0/S_rho085_n16_s4.csv": "0f3ea708f1f4b4e0ff4d81966f5f8620a251de526ebc2e17221b04fd86ae742c",
+    "experiments/journal_p0/S_rho085_n16_s5.csv": "bac30ffa5b6f08e4085c48663571bcb3742bf719d0d3740f1f5d0a07da08abc9",
+    "experiments/journal_p0/S_rho095_n16_s1.csv": "2d833558f8a1a43c2be0c58619658202d5e4c9623e12a28cf66ec5285eb20eb0",
+    "experiments/journal_p0/S_rho095_n16_s2.csv": "0ec36df93688c9b5ffeb67f03ab763e8089738cac066ee530f95b9568fecde05",
+    "experiments/journal_p0/S_rho095_n16_s3.csv": "1d7100f7792af713001b12d95d2ecaab9371bd4a4bca925c652cfc3e8f9af9f1",
+    "experiments/journal_p0/S_rho095_n16_s4.csv": "7e4ff43c1fa27c9511792303e3545c759bc4da8d532ef63b34a5947e5a2801a5",
+    "experiments/journal_p0/S_rho095_n16_s5.csv": "1bbbafaac1715cc8b2de4131e5015f6a812bdbc94abf7befe07fff065def4982",
+    "experiments/journal_p0/r5_design_manifest.json": "885601ea87c5f6c9292b9886edb87b11f58991623a2ab195c97b6da8d7c5f40b",
+    "experiments/journal_p0/rho_manifest.csv": "11e7b66978f09adc5fe2e3a4a57def6958f3356c2e710cb2f4d339bd4616b588"
+  },
+  "nonclaims": [
+    "No disruption-level iid inference is performed.",
+    "No pooled cross-rho p-value is computed.",
+    "The pooled bootstrap interval is descriptive sensitivity, not population inference.",
+    "Single-file os.replace promotions are not family-atomic."
+  ],
+  "owner_script": "experiments/journal_p0/r5_stats.py",
+  "scenario_aggregation": {
+    "cluster": "(rho_target, generation_seed)",
+    "rule": "arithmetic mean of paired disruption effects before any across-scenario summary",
+    "scenario_weighting": "each of the five scenarios receives equal weight regardless of its eligible-disruption count",
+    "within_cluster_unit": "eligible absent caregiver",
+    "zero_drop_definition": "U_common == 0"
+  },
+  "scientific_output_hashes": {
+    "r5_bootstrap.csv": "178544b1e02f73650416b7b5e34cc46d80d4118d9328d1c0d093e1f1d5fe2311",
+    "r5_by_rho.csv": "df9f4de6ad8b56b9669e8d8f562e291f174390e19181c24973a2920a9f059f9f",
+    "r5_scenario_effects.csv": "9a882377fa697f60bb4289e9d4acc5916f919098be7d6754cc1a27611544a394"
+  },
+  "snap_id": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+  "stage": "R5"
+}

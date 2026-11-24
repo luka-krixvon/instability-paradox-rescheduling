@@ -1,0 +1,69 @@
+SNAP_ID=d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60 STAGE=environment
+COMMAND=["/usr/local/bin/python3", "/work/snapshot/experiments/journal_p0/repro/environment_probe.py"]
+{
+  "container": {
+    "base_amd64_manifest": "sha256:70fbdeb75b0d071778ea1df4353ac959118ae8031bc5be33a95d1b8ea1fb8f08",
+    "image_digest": "RECORDED_BY_HOST_AFTER_BUILD"
+  },
+  "os": {
+    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.36",
+    "uname": [
+      "Linux",
+      "0c38fc850170",
+      "6.8.0-136-generic",
+      "#136-Ubuntu SMP PREEMPT_DYNAMIC Wed Jul  1 21:53:05 UTC 2026",
+      "x86_64",
+      ""
+    ]
+  },
+  "packages": {
+    "matplotlib": "3.9.4",
+    "numpy": "2.0.2",
+    "pandas": "2.3.3",
+    "pip_freeze_all": [
+      "contourpy==1.3.0",
+      "cycler==0.12.1",
+      "fonttools==4.60.2",
+      "importlib_resources==6.5.2",
+      "kiwisolver==1.4.7",
+      "matplotlib==3.9.4",
+      "numpy==2.0.2",
+      "packaging==26.2",
+      "pandas==2.3.3",
+      "pillow==11.3.0",
+      "pip==23.0.1",
+      "pyparsing==3.3.2",
+      "python-dateutil==2.9.0.post0",
+      "pytz==2026.3.post1",
+      "scipy==1.13.1",
+      "setuptools==58.1.0",
+      "six==1.17.0",
+      "tzdata==2026.3",
+      "wheel==0.44.0",
+      "zipp==3.23.1"
+    ],
+    "scipy": "1.13.1"
+  },
+  "python": {
+    "executable": "/usr/local/bin/python3",
+    "implementation": "CPython",
+    "version": "3.9.19 (main, Sep  4 2024, 23:10:56) \n[GCC 12.2.0]"
+  },
+  "solver": {
+    "api": "scipy.optimize.milp",
+    "embedded_highs": {
+      "inspected": {
+        "scipy.optimize._highs._highs_constants": {},
+        "scipy.optimize._highs._highs_wrapper": {},
+        "scipy.optimize._highspy._core": {
+          "import_error": "ModuleNotFoundError"
+        }
+      },
+      "reason": "SciPy 1.13.1 exposes milp/HiGHS status semantics but no embedded HiGHS version constant in the inspected runtime modules; no version was guessed.",
+      "status": "not_recoverable_from_scipy_runtime"
+    },
+    "formal_options": {
+      "presolve": false
+    }
+  }
+}

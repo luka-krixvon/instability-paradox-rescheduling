@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Does the stability weight do anything? — audit results</title>
+<meta name="description" content="Interactive results for &quot;Auditing Stability Controls in Dynamic Workforce Reassignment&quot; (Chen &amp; Lin). Every number is read from the sealed stage outputs in deposit/.">
+<style>
+  :root{
+    --bg:#f5f8f8; --bg2:#eaf1f2; --panel:#ffffff; --panel2:#fbfdfd;
+    --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0; --line2:#eef2f3;
+    --a1:#0f766e; --a1-soft:#e6f4f2; --a1-line:#bfe3dd;
+    --a2:#b45309; --a2-soft:#fdf3e0; --a2-line:#f3d59a;
+    --accent:#0f766e; --warn:#b91c1c; --warn-soft:#fdecec; --warn-line:#f6c9c9;
+    --grid:#e8eef0; --shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0b1220; --bg2:#0e1726; --panel:#121c2b; --panel2:#16212f;
+      --ink:#e6edf3; --ink2:#c3cfdb; --muted:#93a4b6; --line:#243244; --line2:#1b2736;
+      --a1:#5eead4; --a1-soft:#10302d; --a1-line:#1f5750;
+      --a2:#fbbf24; --a2-soft:#352507; --a2-line:#6b4a0c;
+      --accent:#5eead4; --warn:#fca5a5; --warn-soft:#3a1414; --warn-line:#6b2525;
+      --grid:#22303f; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b1220; --bg2:#0e1726; --panel:#121c2b; --panel2:#16212f;
+    --ink:#e6edf3; --ink2:#c3cfdb; --muted:#93a4b6; --line:#243244; --line2:#1b2736;
+    --a1:#5eead4; --a1-soft:#10302d; --a1-line:#1f5750;
+    --a2:#fbbf24; --a2-soft:#352507; --a2-line:#6b4a0c;
+    --accent:#5eead4; --warn:#fca5a5; --warn-soft:#3a1414; --warn-line:#6b2525;
+    --grid:#22303f; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",sans-serif;
+    color:var(--ink); background:var(--bg); background-image:linear-gradient(170deg,var(--bg),var(--bg2));
+    min-height:100vh; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:20px 16px 56px}
+  a{color:var(--accent)}
+  code{background:var(--line2);padding:1px 5px;border-radius:5px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  h1,h2,h3{line-height:1.25}
+  header.top{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+  .brand h1{font-size:19px;margin:0 0 4px}
+  .brand p{margin:0;font-size:12.5px;color:var(--muted);max-width:62ch}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12px;
+        color:var(--ink2);box-shadow:var(--shadow);text-decoration:none;cursor:pointer;font:inherit;font-size:12px}
+  .pill:hover{border-color:var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px}
+  .pad{padding:16px 18px}
+  .q{font-size:17px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+  .lead p{margin:0 0 9px;font-size:14px;color:var(--ink2)}
+  .lead p:last-child{margin-bottom:0}
+  .sec{font-size:12px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin:26px 0 10px}
+  h2.h{font-size:16.5px;margin:0 0 6px}
+  .sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
+  .stat{border:1px solid var(--line);border-radius:12px;padding:11px 13px;background:var(--panel2)}
+  .stat .v{font-size:25px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .stat .k{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .stat.a1 .v{color:var(--a1)} .stat.a2 .v{color:var(--a2)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:880px){.grid2{grid-template-columns:1fr}}
+  .ctrls{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+  .lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin-bottom:7px}
+  .seg{display:flex;background:var(--line2);border-radius:10px;padding:3px;gap:3px;flex-wrap:wrap}
+  .seg button{border:none;background:transparent;padding:7px 11px;border-radius:8px;font:inherit;font-size:12.5px;
+              font-weight:600;color:var(--muted);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--panel);color:var(--accent);box-shadow:0 1px 4px rgba(15,23,42,.12)}
+  .seg button:focus-visible,.pill:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .wbox{flex:1;min-width:250px}
+  input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:6px;
+                    background:linear-gradient(90deg,var(--a1),var(--a2));outline:none;margin:6px 0 0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;
+    background:var(--panel);border:3px solid var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(15,23,42,.25)}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--panel);
+    border:3px solid var(--accent);cursor:pointer}
+  .ticks{display:flex;justify-content:space-between;margin-top:5px;gap:2px}
+  .ticks button{border:none;background:transparent;font:inherit;font-size:10.5px;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:5px}
+  .ticks button[aria-pressed="true"]{color:var(--accent);font-weight:800;background:var(--line2)}
+  figure{margin:0}
+  figcaption{font-size:11.5px;color:var(--muted);margin-top:7px}
+  .key{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
+  .key i{width:16px;height:3px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:middle}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:right;padding:7px 8px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums}
+  th:first-child,td:first-child{text-align:left;font-variant-numeric:normal}
+  thead th{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:1px solid var(--line)}
+  tbody tr:hover{background:var(--panel2)}
+  .scroll{overflow-x:auto}
+  .note{border-radius:12px;padding:12px 14px;font-size:12.8px;line-height:1.6;border:1px solid}
+  .note.plain{background:var(--panel2);border-color:var(--line);color:var(--ink2)}
+  .note.care{background:var(--warn-soft);border-color:var(--warn-line);color:var(--ink)}
+  .note.a1{background:var(--a1-soft);border-color:var(--a1-line)}
+  ul.tight{margin:8px 0 0;padding-left:19px;font-size:13px;color:var(--ink2)}
+  ul.tight li{margin-bottom:5px}
+  ol.steps{margin:10px 0 0;padding-left:20px;font-size:13.5px;color:var(--ink2)}
+  ol.steps li{margin-bottom:8px}
+  .tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
+       padding:2px 7px;border-radius:999px;border:1px solid}
+  .tag.a1{color:var(--a1);border-color:var(--a1-line);background:var(--a1-soft)}
+  .tag.a2{color:var(--a2);border-color:var(--a2-line);background:var(--a2-soft)}
+  .readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-top:12px}
+  .ro{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel2)}
+  .ro .k{font-size:10.5px;color:var(--muted)}
+  .ro .v{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums}
+  .foot{margin-top:28px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--line);padding-top:16px}
+  .foot a{color:var(--accent)}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <h1>Does the stability weight actually do anything?</h1>
+    <p>Interactive results for <em>Auditing Stability Controls in Dynamic Workforce Reassignment:
+      Assignment-Only versus Displacement Recovery in Home Healthcare</em> — Teng-Ruei Chen &amp; Chun-Cheng Lin.
+      Every number on this page is read from the sealed stage outputs shipped in <code>deposit/</code>.</p>
+  </div>
+  <nav class="toolbar" aria-label="Page links">
+    <a class="pill" href="https://doi.org/10.66977/xsci.2611.0042">Paper · DOI 10.66977/xsci.2611.0042</a>
+    <a class="pill" href="../deposit/">Recomputable deposit</a>
+    <a class="pill" href="mechanism.html">Worked mechanism →</a>
+    <button class="pill" id="theme" type="button" aria-label="Switch colour theme">Theme</button>
+  </nav>
+</header>
+
+<section class="card lead"><div class="pad">
+  <p class="q">A scheduler lets you set a penalty on “how much the roster changes”. When a caregiver calls in
+     sick, does turning that dial up actually buy you a more stable roster?</p>
+  <p>It depends on what the recovery is allowed to do. If recovery may only place the orphaned visits and must
+     leave every incumbent assignment alone (<b>A1, assignment-only</b>), the number of changed assignments is
+     fixed by the event itself. The dial multiplies a constant. If recovery may also move incumbent visits
+     (<b>A2, displacement</b>) and that genuinely lowers attainable overtime at the same service level, then two
+     or more non-dominated cost vectors exist and the dial really does choose between them.</p>
+  <p>This page shows that contrast in the paper's data, and ends with the diagnostic the paper proposes:
+     <b>before you expose a stability weight, test whether deviation varies at all over service-equivalent
+     recoveries.</b></p>
+</div></section>
+
+<section class="card"><div class="pad">
+  <div class="note plain" id="scopeStrip"></div>
+</div></section>
+
+<h2 class="sec">1 · What the audit covers</h2>
+<section class="card"><div class="pad">
+  <div class="statgrid" id="headline"></div>
+  <p class="sub" style="margin:12px 0 0">
+    A disruption is one absent caregiver inside one derived scenario. <b>Disruptions are nested within
+    scenarios</b>, so every aggregate below is scenario-clustered, never treated as independent observations.
+    “Qualified” means the orphan-placeability condition the theorem needs actually holds
+    (<code>U_common = 0</code>: no service is lost under either recovery).
+  </p>
+</div></section>
+
+<h2 class="sec">2 · The core contrast — weight response</h2>
+<section class="card"><div class="pad">
+  <h2 class="h">A1 is flat across the whole weight grid. A2 moves.</h2>
+  <p class="sub">Scenario means, then equal weight per capacity stratum, over the six registered values of the
+     deviation weight <code>w4</code>. Pick a stratum to see how capacity tightness changes the picture.</p>
+
+  <div class="ctrls">
+    <div>
+      <div class="lbl" id="stratLbl">capacity stratum (&rho;)</div>
+      <div class="seg" role="group" aria-labelledby="stratLbl" id="strat"></div>
+    </div>
+    <div class="wbox">
+      <div class="lbl"><label for="w4">deviation weight w4</label></div>
+      <input type="range" id="w4" min="0" max="5" step="1" value="0" aria-describedby="w4read">
+      <div class="ticks" role="group" aria-label="Weight grid" id="ticks"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:16px">
+    <figure><svg id="chDev" viewBox="0 0 520 260" width="100%" role="img" aria-labelledby="chDevT chDevD"></svg>
+      <figcaption id="capDev"></figcaption></figure>
+    <figure><svg id="chOt" viewBox="0 0 520 260" width="100%" role="img" aria-labelledby="chOtT chOtD"></svg>
+      <figcaption id="capOt"></figcaption></figure>
+  </div>
+  <div class="key">
+    <span><i style="background:var(--a1)"></i><b>A1</b> assignment-only</span>
+    <span><i style="background:var(--a2)"></i><b>A2</b> displacement allowed</span>
+    <span>● value at the selected w4</span>
+  </div>
+
+  <div class="readout" id="sweepRead"></div>
+  <div class="note a1" id="sweepNote" style="margin-top:12px"></div>
+</div></section>
+
+<section class="card"><div class="pad">
+  <h2 class="h">The gap between them, and what stability costs A2</h2>
+  <p class="sub">A2 minus A1 at each registered weight, pooled with equal weight per stratum. The shaded band is a
+     <b>descriptive</b> cluster-bootstrap sensitivity interval.</p>
+  <div class="grid2">
+    <figure><svg id="chDelta" viewBox="0 0 520 250" width="100%" role="img" aria-labelledby="chDeltaT chDeltaD"></svg>
+      <figcaption id="capDelta"></figcaption></figure>
+    <div>
+      <div class="statgrid" id="cosBox"></div>
+      <div class="note care" style="margin-top:12px" id="cosNote"></div>
+    </div>
+  </div>
+</div></section>
+
+<h2 class="sec">3 · How the picture changes with capacity tightness</h2>
+<section class="card"><div class="pad">
+  <h2 class="h">Per-stratum structure</h2>
+  <p class="sub">&rho; is the target caregiver capacity cap ratio: five derived scenarios at each of six levels.
+     Loose strata have nothing for a weight to select; tight strata have a wide frontier.</p>
+  <figure><svg id="chRho" viewBox="0 0 980 250" width="100%" role="img" aria-labelledby="chRhoT chRhoD"></svg>
+    <figcaption>Share of qualified disruptions on which A2's epsilon trace returns more than one cost vector,
+      by stratum. A1 returns exactly one on every qualified disruption in every stratum.</figcaption></figure>
+  <div class="scroll" style="margin-top:14px">
+    <table id="rhoTable">
+      <caption class="vh">Per-stratum counts and cost of stability</caption>
+    </table>
+  </div>
+  <p class="sub" style="margin-top:10px">Cost of stability is per scenario: A2's overtime at w4=100 minus at w4=0,
+     averaged over the disruptions inside that scenario. Median and interquartile range are over the five
+     scenarios in the stratum — a spread across scenarios, not a confidence statement. The pooled figure in the
+     last row is a <em>mean</em> of scenario estimates, equally weighted across the six strata, so it need not
+     fall between the per-stratum medians.</p>
+</div></section>
+
+<section class="card"><div class="pad">
+  <h2 class="h">How many cost vectors does A2 actually expose?</h2>
+  <p class="sub">Distinct (deviation, overtime) pairs returned by the registered epsilon trace, over the
+     488 qualified disruptions. A1's bar would be a single column of height 488 at “1”.</p>
+  <figure><svg id="chHist" viewBox="0 0 980 230" width="100%" role="img" aria-labelledby="chHistT chHistD"></svg>
+    <figcaption id="capHist"></figcaption></figure>
+</div></section>
+
+<h2 class="sec">4 · Four disruptions you can read one at a time</h2>
+<section class="card"><div class="pad">
+  <h2 class="h">The efficient set, drawn from the sealed traces</h2>
+  <p class="sub">Each point is one non-dominated cost vector at the common service level. A1 collapses to a single
+     point; where A2 has a frontier, the weight slider above walks along it.</p>
+  <div class="lbl" id="caseLbl">disruption</div>
+  <div class="seg" role="group" aria-labelledby="caseLbl" id="caseSel"></div>
+  <div class="grid2" style="margin-top:14px">
+    <figure><svg id="chCase" viewBox="0 0 520 320" width="100%" role="img" aria-labelledby="chCaseT chCaseD"></svg>
+      <figcaption id="capCase"></figcaption></figure>
+    <div>
+      <div class="note plain" id="caseMeta"></div>
+      <div class="scroll" style="margin-top:12px"><table id="caseTable">
+        <caption class="vh">Selected cost vector at each registered weight</caption></table></div>
+    </div>
+  </div>
+</div></section>
+
+<h2 class="sec">5 · The practical contribution</h2>
+<section class="card"><div class="pad">
+  <h2 class="h">A diagnostic to run before you expose a stability weight</h2>
+  <p class="sub">The paper's recommendation is not a new solver. It is a test you can run on your own instance
+     with the optimiser you already have.</p>
+  <ol class="steps">
+    <li>Fix the service level the recovery must hit — the best unserved count both recovery modes can reach.</li>
+    <li>At that service level, sweep an epsilon-constraint on deviation and record every attainable
+      (deviation, overtime) pair.</li>
+    <li>Drop the dominated pairs. <b>Count what is left.</b></li>
+    <li>If exactly one cost vector remains, a componentwise nondecreasing stability weight cannot change the
+      outcome. Exposing the dial would be misleading: it would look like a control and behave like a constant.
+      Fix the recovery policy instead, or widen the action space.</li>
+    <li>If two or more remain — which here required displacement to <b>strictly</b> lower attainable overtime at
+      the common service level — the weight is a real control, and the sweep you just ran is also the menu you
+      should be showing the scheduler.</li>
+  </ol>
+  <div class="note a1" style="margin-top:14px">
+    <b>Why A1 collapses.</b> Under the paper's incumbent-feasibility and orphan-placeability conditions,
+    assignment-only recovery can only place orphaned visits into free slots; the set of changed assignments is
+    fixed by the event, so deviation is a <b>counting invariant</b>. A weight multiplying a constant adds the
+    same amount to every candidate, so the service-maximal efficient set holds exactly <b>one cost vector</b>
+    (several assignment vectors may still tie on it). No componentwise nondecreasing scalarization can reveal a
+    second one — a weight cannot create a frontier the feasible set does not contain.
+    <a href="mechanism.html">Work through a hand-checkable instance →</a>
+  </div>
+</div></section>
+
+<h2 class="sec">6 · Scope, and what is not claimed</h2>
+<section class="card"><div class="pad">
+  <div class="grid2">
+    <div>
+      <h2 class="h">Scope of the evidence</h2>
+      <ul class="tight" id="scopeList"></ul>
+    </div>
+    <div>
+      <h2 class="h">Not claimed</h2>
+      <ul class="tight" id="notClaimed"></ul>
+    </div>
+  </div>
+</div></section>
+
+<h2 class="sec">7 · Where every number comes from</h2>
+<section class="card"><div class="pad">
+  <p class="sub">The deposit carries the stage outputs and the script that derives each reported figure from them.
+     Re-running that script re-derives the table below; that is a consistency check on sealed outputs, not a
+     proof that the underlying optimisation is correct.</p>
+  <div class="scroll"><table id="provTable">
+    <caption class="vh">Source file for each reported quantity</caption></table></div>
+  <p class="sub" style="margin-top:12px" id="snapLine"></p>
+</div></section>
+
+<footer class="foot">
+  <p><b>Paper.</b> Teng-Ruei Chen &amp; Chun-Cheng Lin, “Auditing Stability Controls in Dynamic Workforce
+    Reassignment: Assignment-Only versus Displacement Recovery in Home Healthcare”, XSci preprint,
+    <a href="https://doi.org/10.66977/xsci.2611.0042">DOI 10.66977/xsci.2611.0042</a>.</p>
+  <p><b>Data.</b> Sealed stage outputs in <a href="../deposit/"><code>deposit/run/results/</code></a>;
+    derivations in <code>deposit/code/build_formal_results.py</code>; the same figures in machine-readable form
+    in <a href="data/results.json"><code>demo/data/results.json</code></a>. The synthetic base instance the
+    scenarios are derived from is not redistributable and is not in this repository.</p>
+  <p>This page runs entirely offline: no fetch, no CDN, no tracking. <a href="mechanism.html">Worked mechanism</a>.</p>
+</footer>
+
+</div>
+
+<script>
+/* ----------------------------------------------------------------------------
+   All figures below are read from this object, which mirrors demo/data/results.json.
+   Provenance for each field: deposit/run/results/{R1,R1b,R5}/*.csv
+   ------------------------------------------------------------------------- */
+const DATA = {
+  totals:{scenarios:30,disruptions:518,incumbent_flat_feasible:518,zero_drop:488,positive_u_reported:30,
+    a1_inert_all:498,a1_inert_qualified:488,a1_singleton_eps_qualified:488,
+    a2_responsive_all:235,a2_responsive_qualified:206,
+    a2_multicost_eps_all:253,a2_multicost_eps_qualified:224,
+    a2_strict_overtime_all:253,a2_strict_overtime_qualified:224},
+  w4:[0,5,10,20,50,100],
+  pooled:{A1:{deviation:[11.294985,11.294985,11.286096,11.268001,11.229788,11.184303],
+              overtime:[819.391683,819.391683,819.405016,819.452635,819.793433,820.405533]},
+          A2:{deviation:[47.466235,47.0793,45.919647,43.234541,38.458675,29.111675],
+              overtime:[35.515972,35.734396,37.103082,45.316053,77.377175,197.631736]}},
+  byRho:[
+    {rho:0.45,scen:5,disr:121,zero:121,posU:0,a1s:121,a2m:5,a2r:5,a2strict:5,
+     cos:{median:0,q1:0,q3:0.565217391304,min:0,max:2.92307692308},
+     A1:{deviation:[7.6982,7.6982,7.6982,7.6982,7.6982,7.6982],overtime:[1.131,1.131,1.131,1.131,1.131,1.131]},
+     A2:{deviation:[7.7771,7.7771,7.7771,7.7771,7.7289,7.6982],overtime:[0.4333,0.4333,0.4333,0.4333,0.6925,1.131]}},
+    {rho:0.55,scen:5,disr:96,zero:96,posU:0,a1s:96,a2m:11,a2r:6,a2strict:11,
+     cos:{median:1.47368421053,q1:0,q3:1.57894736842,min:0,max:2.14285714286},
+     A1:{deviation:[9.7118,9.7118,9.7118,9.7118,9.7118,9.7118],overtime:[6.0179,6.0179,6.0179,6.0179,6.0179,6.0179]},
+     A2:{deviation:[9.9293,9.9293,9.9293,9.9083,9.8662,9.807],overtime:[2.3883,2.3883,2.3883,2.4409,2.7567,3.4274]}},
+    {rho:0.65,scen:5,disr:85,zero:84,posU:1,a1s:84,a2m:21,a2r:8,a2strict:21,
+     cos:{median:0.947368421053,q1:0.8125,q3:2.05882352941,min:0,max:6.375},
+     A1:{deviation:[10.9738,10.9738,10.9738,10.9738,10.9738,10.9738],overtime:[30.3188,30.3188,30.3188,30.3188,30.3188,30.3188]},
+     A2:{deviation:[11.7242,11.6992,11.6992,11.6992,11.6032,11.5046],overtime:[9.8289,9.8414,9.8414,9.8414,10.6184,11.8677]}},
+    {rho:0.75,scen:5,disr:79,zero:73,posU:6,a1s:73,a2m:73,a2r:73,a2strict:73,
+     cos:{median:661.25,q1:625.384615385,q3:665.823529412,min:556.823529412,max:706},
+     A1:{deviation:[11.8924,11.8924,11.8924,11.8924,11.8366,11.8116],overtime:[687.7508,687.7508,687.7508,687.7508,688.2806,688.5806]},
+     A2:{deviation:[82.4089,81.7012,78.4242,70.408,52.2325,12.5972],overtime:[10.739,11.1236,15.0848,40.5405,162.9773,653.7953]}},
+    {rho:0.85,scen:5,disr:72,zero:58,posU:14,a1s:58,a2m:58,a2r:58,a2strict:58,
+     cos:{median:176.266666667,q1:161,q3:258.333333333,min:135,max:272},
+     A1:{deviation:[13.0941,13.0941,13.0407,12.9607,12.8807,12.69],overtime:[1678.8189,1678.8189,1678.8989,1679.0989,1679.7256,1682.3553]},
+     A2:{deviation:[84.9254,84.5213,81.6492,78.367,73.2448,62.6369],overtime:[101.1525,101.3812,104.5651,115.3573,147.1253,301.6725]}},
+    {rho:0.95,scen:5,disr:65,zero:56,posU:9,a1s:56,a2m:56,a2r:56,a2strict:56,
+     cos:{median:113.818181818,q1:92.3846153846,q3:116.153846154,min:90.1428571429,max:214.214285714},
+     A1:{deviation:[14.3997,14.3997,14.3997,14.3711,14.2776,14.2205],overtime:[2512.3127,2512.3127,2512.3127,2512.3984,2513.2867,2514.0296]},
+     A2:{deviation:[88.0325,86.8477,86.0389,81.2477,76.0764,70.4261],overtime:[88.5537,89.2385,90.3055,103.2828,140.0927,213.8965]}}
+  ],
+  delta:{deviation:{point:[36.1712498339,35.7843148245,34.6335511601,31.9665404489,27.228886821,17.9273717743],
+                    lo:[35.6691716457,35.3917356591,34.2608113622,31.3366711326,26.3042814238,16.894787202],
+                    hi:[36.6733280222,36.1385181941,35.1014430848,32.5964097652,28.1792681227,18.5824225121]},
+         overtime:{point:[-783.875711355,-783.657286585,-782.301934111,-774.136581809,-742.416257739,-622.773797019],
+                   lo:[-801.434772298,-801.279309982,-799.993818709,-791.093696176,-762.397806751,-641.214211287],
+                   hi:[-758.037463526,-757.759067616,-756.314863602,-748.901608093,-712.717079595,-591.571293045]}},
+  cos:{point:162.115764514,lo:151.503817921,hi:171.103386053,resamples:10000,seed:20260730,strata:6,clusters:5},
+  a1Drift:1.013850178,
+  hist:[[1,264],[2,29],[3,7],[5,1],[26,2],[27,1],[28,3],[29,6],[30,5],[31,4],[32,7],[33,12],[34,11],[35,15],
+        [36,17],[37,15],[38,25],[39,22],[40,11],[41,1],[42,5],[43,4],[44,9],[45,4],[46,4],[47,1],[48,3]],
+  cases:[
+    {id:"rho0.45-s1-a0",tab:"&rho;=0.45 · collapsed",rho:0.45,seed:1,absent:0,
+     label:"Both modes collapse — the weight has nothing to select",
+     meta:{elig:24,carers:27,grid:[19,19],gridN:1},
+     A1:[[19,0]],A2:[[19,0]],
+     pathA1:[[19,0],[19,0],[19,0],[19,0],[19,0],[19,0]],
+     pathA2:[[19,0],[19,0],[19,0],[19,0],[19,0],[19,0]],
+     note:"Displacement buys nothing here: A2's minimum attainable overtime is not below A1's, so A2's efficient set is also a single cost vector. On a disruption like this, the diagnostic says do not expose the dial."},
+    {id:"rho0.65-s5-a49",tab:"&rho;=0.65 · frontier opens",rho:0.65,seed:5,absent:49,
+     label:"The frontier just opens — five cost vectors",
+     meta:{elig:16,carers:19,grid:[9,17],gridN:9},
+     A1:[[9,198]],A2:[[9,198],[11,95],[13,22],[15,1],[17,0]],
+     pathA1:[[9,198],[9,198],[9,198],[9,198],[9,198],[9,198]],
+     pathA2:[[17,0],[15,1],[15,1],[15,1],[15,1],[13,22]],
+     note:"A1's nine epsilon rows all return the same cost vector. A2 returns five mutually non-dominated vectors, and the registered weights move A2 across three of them."},
+    {id:"rho0.75-s5-a45",tab:"&rho;=0.75 · wide frontier",rho:0.75,seed:5,absent:45,
+     label:"A wide frontier that ends exactly on A1's vector",
+     meta:{elig:13,carers:17,grid:[5,91],gridN:87},
+     A1:[[5,687]],
+     A2:[[5,687],[7,657],[9,628],[11,599],[13,570],[15,542],[17,515],[19,489],[21,465],[23,441],[25,417],[27,394],
+         [29,371],[31,349],[33,327],[35,305],[37,283],[39,261],[41,239],[43,218],[45,198],[47,178],[49,159],[51,142],
+         [53,125],[55,112],[57,100],[59,89],[61,79],[63,70],[65,62],[67,53],[69,46],[71,38],[73,31],[75,24],[77,17],
+         [79,13],[81,10],[83,7],[85,4],[87,2],[89,1],[91,0]],
+     pathA1:[[5,687],[5,687],[5,687],[5,687],[5,687],[5,687]],
+     pathA2:[[91,0],[87,2],[79,13],[67,53],[47,178],[5,687]],
+     note:"Raising the weight walks A2 the full width of its 44-vector frontier until it lands on exactly the cost vector A1 was pinned to all along. This is the clearest single illustration of the contrast."},
+    {id:"rho0.85-s4-a21",tab:"&rho;=0.85 · largest traced",rho:0.85,seed:4,absent:21,
+     label:"The largest traced frontier — 48 cost vectors",
+     meta:{elig:15,carers:19,grid:[1,95],gridN:95},
+     A1:[[1,1819]],
+     A2:[[1,1819],[3,1730],[5,1664],[7,1600],[9,1537],[11,1474],[13,1412],[15,1350],[17,1289],[19,1229],[21,1170],
+         [23,1113],[25,1056],[27,999],[29,943],[31,887],[33,832],[35,779],[37,729],[39,679],[41,630],[43,581],
+         [45,533],[47,486],[49,442],[51,401],[53,361],[55,321],[57,282],[59,244],[61,207],[63,174],[65,143],
+         [67,114],[69,88],[71,71],[73,55],[75,40],[77,33],[79,26],[81,18],[83,11],[85,9],[87,6],[89,4],[91,2],
+         [93,1],[95,0]],
+     pathA1:[[1,1819],[1,1819],[1,1819],[1,1819],[1,1819],[1,1819]],
+     pathA2:[[95,0],[91,2],[83,11],[75,40],[69,88],[55,321]],
+     note:"1,819 minutes of overtime that no weight lets A1 avoid, against an A2 frontier that reaches zero overtime at 95 assignment changes."}
+  ],
+  scope:["One synthetic base instance; 30 derived scenarios (six capacity strata &times; five seeds); 518 disruptions.",
+         "Disruptions are <b>nested within scenarios</b>. Every pooled figure is a scenario mean first, then an equal weight per stratum — never a disruption-level average.",
+         "Fixed slots; travel enters only as a workload proxy; no routing and no time-window propagation are modelled.",
+         "The reported interval is a <b>descriptive</b> cluster-bootstrap sensitivity interval over five shared seed clusters. It is not a significance test and not population inference.",
+         "The base instance is synthetic and not redistributable; it is not in this repository. What is provided is <code>deposit/</code>, which carries the sealed stage outputs and the derivation script."],
+  notClaimed:["No numeric weight threshold and no phase boundary. A counterexample with both cited assumptions holding refutes any such boundary.",
+              "No complexity separation between A1 and A2. The proofs are incomplete, so the claim is not asserted.",
+              "No external benchmark validation. The external-validity chapter was removed in full.",
+              "No statistical significance of any kind; no p-value is computed anywhere in the deposit.",
+              "Recomputing these numbers from the sealed outputs, or matching their digests, is a consistency check — not a proof that the optimisation is correct."],
+  prov:[["30 scenarios · 518 disruptions · 488 qualified · 518 incumbent-flat-feasible","R1/eps_range.csv","row count, (&rho;,seed) pairs, U_common, incumbent_flat_feasible"],
+        ["A1 returns one cost vector on 488/488 qualified; A2 returns more than one on 224/488","R1/eps_frontier.csv","distinct (D,W) pairs per (disruption, method)"],
+        ["A2 strictly lowers attainable overtime on 224/488 qualified","R1/eps_frontier.csv","per-disruption min(W), A2 against A1"],
+        ["A1 inert on 488/488 qualified (498/518 overall); A2 weight-responsive on 206/488","R1b/e4_raw.csv","(U,W,D) constant across all six w4"],
+        ["Pooled weight sweep, both methods, all six weights","R1b/e4_raw.csv","scenario mean, then equal weight per stratum"],
+        ["A2 minus A1 at each weight, with descriptive intervals","R5/r5_bootstrap.csv","10,000 cluster resamples, rng seed 20260730"],
+        ["Cost of stability 162.115764514 min [151.503817921, 171.103386053]","R5/r5_bootstrap.csv","estimand A2_cost_of_stability, w4 0 &rarr; 100"],
+        ["Per-stratum medians and interquartile ranges","R5/r5_by_rho.csv","five scenario estimates per stratum"]],
+  snap:"d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60"
+};
+
+const $ = id => document.getElementById(id);
+const W4 = DATA.w4;
+let wIdx = 0, stratIdx = -1, caseIdx = 2;
+
+/* ---------- number helpers ---------- */
+const f1 = v => v.toFixed(1);
+const f2 = v => v.toFixed(2);
+const pct = (a,b) => (100*a/b).toFixed(1) + '%';
+const grp = v => v.toLocaleString('en-US');
+
+/* ---------- generic line chart ---------- */
+function niceMax(v){
+  if(v<=0) return 1;
+  const e = Math.pow(10, Math.floor(Math.log10(v)));
+  const m = v/e;
+  const s = m<=1?1 : m<=1.5?1.5 : m<=2?2 : m<=2.5?2.5 : m<=5?5 : 10;
+  return s*e;
+}
+function lineChart(svgId, titleId, descId, opt){
+  const W=520,H=260,P={l:58,r:14,t:16,b:42}, xw=W-P.l-P.r, yh=H-P.t-P.b;
+  const all = opt.series.flatMap(s=>s.values);
+  const top = niceMax(Math.max(...all, opt.minTop||0));
+  const X = i => P.l + (W4.length===1?0:i/(W4.length-1))*xw;
+  const Y = v => P.t + (1 - v/top)*yh;
+  let o = '';
+  const G=4;
+  for(let g=0;g<=G;g++){
+    const y = P.t + g/G*yh, val = top - g/G*top;
+    o += `<line x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}" stroke="var(--grid)"/>`;
+    o += `<text x="${P.l-7}" y="${y+3.5}" font-size="10" fill="var(--muted)" text-anchor="end">${val>=100?Math.round(val):(+val.toFixed(1))}</text>`;
+  }
+  W4.forEach((w,i)=>{ o += `<text x="${X(i)}" y="${H-20}" font-size="10" fill="var(--muted)" text-anchor="middle">${w}</text>`; });
+  o += `<text x="${P.l+xw/2}" y="${H-5}" font-size="10.5" fill="var(--muted)" text-anchor="middle">deviation weight w4 &#8594;</text>`;
+  o += `<text transform="translate(13,${P.t+yh/2}) rotate(-90)" font-size="10.5" fill="var(--muted)" text-anchor="middle">${opt.yLabel}</text>`;
+  o += `<line x1="${X(wIdx)}" y1="${P.t}" x2="${X(wIdx)}" y2="${P.t+yh}" stroke="var(--muted)" stroke-dasharray="3 3" opacity=".55"/>`;
+  opt.series.forEach(s=>{
+    o += `<path d="${s.values.map((v,i)=>(i?'L':'M')+X(i)+' '+Y(v)).join(' ')}" fill="none" stroke="${s.color}" stroke-width="2.6" stroke-linejoin="round"/>`;
+    s.values.forEach((v,i)=>{
+      const r = i===wIdx?5:3;
+      o += `<circle cx="${X(i)}" cy="${Y(v)}" r="${r}" fill="${s.color}" ${i===wIdx?'stroke="var(--panel)" stroke-width="1.8"':''}>`+
+           `<title>${s.label} · w4=${W4[i]} · ${(+v.toFixed(3))} ${opt.unit}</title></circle>`;
+    });
+    const last = s.values[s.values.length-1];
+    o += `<text x="${X(W4.length-1)-4}" y="${Y(last) + (s.above? -9 : 15)}" font-size="11" font-weight="700" fill="${s.color}" text-anchor="end">${s.label}</text>`;
+  });
+  const svg = $(svgId);
+  svg.innerHTML = `<title id="${titleId}">${opt.title}</title><desc id="${descId}">${opt.desc}</desc>` + o;
+}
+
+/* ---------- delta chart with descriptive band ---------- */
+function deltaChart(){
+  const d = DATA.delta.overtime, W=520,H=250,P={l:62,r:14,t:18,b:44}, xw=W-P.l-P.r, yh=H-P.t-P.b;
+  const lo = Math.min(...d.lo), hi = Math.max(...d.hi, 0);
+  const yMin = -niceMax(-lo), yMax = 0;
+  const X = i => P.l + i/(W4.length-1)*xw;
+  const Y = v => P.t + (1 - (v-yMin)/(yMax-yMin))*yh;
+  let o=''; const G=4;
+  for(let g=0;g<=G;g++){
+    const y=P.t+g/G*yh, val=yMax-(g/G)*(yMax-yMin);
+    o+=`<line x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}" stroke="var(--grid)"/>`+
+       `<text x="${P.l-7}" y="${y+3.5}" font-size="10" fill="var(--muted)" text-anchor="end">${Math.round(val)}</text>`;
+  }
+  W4.forEach((w,i)=>o+=`<text x="${X(i)}" y="${H-22}" font-size="10" fill="var(--muted)" text-anchor="middle">${w}</text>`);
+  o+=`<text x="${P.l+xw/2}" y="${H-6}" font-size="10.5" fill="var(--muted)" text-anchor="middle">deviation weight w4 &#8594;</text>`;
+  o+=`<text transform="translate(14,${P.t+yh/2}) rotate(-90)" font-size="10.5" fill="var(--muted)" text-anchor="middle">A2 &minus; A1 overtime (min)</text>`;
+  const band = d.hi.map((v,i)=>(i?'L':'M')+X(i)+' '+Y(v)).join(' ') + ' ' +
+               d.lo.map((v,i)=>'L'+X(W4.length-1-i)+' '+Y(d.lo[W4.length-1-i])).join(' ') + ' Z';
+  o+=`<path d="${band}" fill="var(--a2)" opacity=".16"/>`;
+  o+=`<line x1="${X(wIdx)}" y1="${P.t}" x2="${X(wIdx)}" y2="${P.t+yh}" stroke="var(--muted)" stroke-dasharray="3 3" opacity=".55"/>`;
+  o+=`<path d="${d.point.map((v,i)=>(i?'L':'M')+X(i)+' '+Y(v)).join(' ')}" fill="none" stroke="var(--a2)" stroke-width="2.6"/>`;
+  d.point.forEach((v,i)=>o+=`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===wIdx?5:3}" fill="var(--a2)" ${i===wIdx?'stroke="var(--panel)" stroke-width="1.8"':''}>`+
+    `<title>w4=${W4[i]} · ${v.toFixed(3)} min, descriptive interval [${d.lo[i].toFixed(3)}, ${d.hi[i].toFixed(3)}]</title></circle>`);
+  $('chDelta').innerHTML = `<title id="chDeltaT">A2 minus A1 overtime across the weight grid</title>`+
+    `<desc id="chDeltaD">A2 uses between ${Math.round(-d.point[0])} and ${Math.round(-d.point[5])} fewer minutes of overtime than A1 at every registered weight; the shaded band is a descriptive cluster-bootstrap interval.</desc>` + o;
+  $('capDelta').innerHTML = `A2 stays below A1 at every weight, by ${f1(-d.point[0])} min at w4=0 and ${f1(-d.point[5])} min at w4=100. `+
+    `Band: descriptive 95% cluster-bootstrap interval, ${grp(DATA.cos.resamples)} resamples.`;
+}
+
+/* ---------- per-stratum bars ---------- */
+function rhoChart(){
+  const W=980,H=250,P={l:52,r:16,t:18,b:52}, xw=W-P.l-P.r, yh=H-P.t-P.b;
+  const n=DATA.byRho.length, bw=xw/n;
+  let o=''; const G=4;
+  for(let g=0;g<=G;g++){
+    const y=P.t+g/G*yh;
+    o+=`<line x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}" stroke="var(--grid)"/>`+
+       `<text x="${P.l-8}" y="${y+3.5}" font-size="11" fill="var(--muted)" text-anchor="end">${100-g/G*100}%</text>`;
+  }
+  DATA.byRho.forEach((r,i)=>{
+    const share = r.a2m/r.zero, x=P.l+i*bw+bw*0.22, w=bw*0.56, h=share*yh, y=P.t+yh-h;
+    o+=`<rect x="${x}" y="${y}" width="${w}" height="${Math.max(h,1)}" rx="5" fill="var(--a2)" opacity=".88">`+
+       `<title>&rho;=${r.rho}: A2 returns more than one cost vector on ${r.a2m} of ${r.zero} qualified disruptions (${pct(r.a2m,r.zero)})</title></rect>`;
+    o+=`<text x="${x+w/2}" y="${y-7}" font-size="11.5" font-weight="700" fill="var(--a2)" text-anchor="middle">${pct(r.a2m,r.zero)}</text>`;
+    o+=`<line x1="${P.l+i*bw+bw*0.12}" y1="${P.t+yh}" x2="${P.l+i*bw+bw*0.88}" y2="${P.t+yh}" stroke="var(--a1)" stroke-width="3"/>`;
+    o+=`<text x="${P.l+i*bw+bw/2}" y="${H-30}" font-size="12" font-weight="700" fill="var(--ink2)" text-anchor="middle">&rho; = ${r.rho}</text>`;
+    o+=`<text x="${P.l+i*bw+bw/2}" y="${H-14}" font-size="10.5" fill="var(--muted)" text-anchor="middle">${r.zero} qualified · ${r.a2m} multi-vector</text>`;
+  });
+  o+=`<text transform="translate(13,${P.t+yh/2}) rotate(-90)" font-size="10.5" fill="var(--muted)" text-anchor="middle">share of qualified disruptions</text>`;
+  $('chRho').innerHTML = `<title id="chRhoT">Share of qualified disruptions where A2 exposes more than one cost vector, by capacity stratum</title>`+
+    `<desc id="chRhoD">The share rises from ${pct(DATA.byRho[0].a2m,DATA.byRho[0].zero)} at the loosest stratum to 100% at the three tightest. The teal baseline marks A1, which exposes exactly one cost vector in every stratum.</desc>` + o;
+}
+
+/* ---------- cost-vector histogram ---------- */
+function histChart(){
+  const W=980,H=230,P={l:52,r:16,t:20,b:46}, xw=W-P.l-P.r, yh=H-P.t-P.b;
+  const h=DATA.hist, maxK=48, maxV=Math.max(...h.map(d=>d[1]));
+  const bw = xw/maxK;
+  const Y = v => P.t + (1 - v/ niceMax(maxV))*yh;
+  let o='';
+  const top = niceMax(maxV), G=4;
+  for(let g=0;g<=G;g++){
+    const y=P.t+g/G*yh;
+    o+=`<line x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}" stroke="var(--grid)"/>`+
+       `<text x="${P.l-8}" y="${y+3.5}" font-size="10.5" fill="var(--muted)" text-anchor="end">${Math.round(top-g/G*top)}</text>`;
+  }
+  h.forEach(([k,v])=>{
+    const x=P.l+(k-1)*bw+bw*0.12, w=Math.max(bw*0.76,2.4), y=Y(v);
+    o+=`<rect x="${x}" y="${y}" width="${w}" height="${P.t+yh-y}" rx="2" fill="${k===1?'var(--a1)':'var(--a2)'}" opacity=".9">`+
+       `<title>${v} qualified disruptions where A2's trace returns ${k} distinct cost vector${k>1?'s':''}</title></rect>`;
+  });
+  o+=`<text x="${P.l+bw*0.5}" y="${Y(264)-8}" font-size="11.5" font-weight="700" fill="var(--a1)" text-anchor="start">264 single-vector</text>`;
+  const gx1=P.l+5*bw, gx2=P.l+25*bw;
+  o+=`<rect x="${gx1}" y="${P.t}" width="${gx2-gx1}" height="${yh}" fill="var(--muted)" opacity=".07"/>`;
+  o+=`<text x="${(gx1+gx2)/2}" y="${P.t+18}" font-size="10.5" fill="var(--muted)" text-anchor="middle">empty: no disruption lands here</text>`;
+  [1,10,20,30,40,48].forEach(k=>o+=`<text x="${P.l+(k-0.5)*bw}" y="${H-24}" font-size="10.5" fill="var(--muted)" text-anchor="middle">${k}</text>`);
+  o+=`<text x="${P.l+xw/2}" y="${H-7}" font-size="10.5" fill="var(--muted)" text-anchor="middle">distinct cost vectors in A2's epsilon trace &#8594;</text>`;
+  o+=`<text transform="translate(13,${P.t+yh/2}) rotate(-90)" font-size="10.5" fill="var(--muted)" text-anchor="middle">qualified disruptions</text>`;
+  $('chHist').innerHTML = `<title id="chHistT">Distribution of the number of cost vectors A2 exposes</title>`+
+    `<desc id="chHistD">264 of 488 qualified disruptions give A2 a single cost vector, 37 give between two and five, and 187 give between 26 and 48. Nothing lands between 6 and 25.</desc>` + o;
+  const low = 264+29+7+1, high = 488-low;
+  $('capHist').innerHTML = `On ${low} of ${DATA.totals.zero_drop} qualified disruptions A2 exposes at most five cost vectors — `+
+    `${264} of them exactly one, exactly like A1. On the remaining ${high} it exposes between 26 and 48. The empty stretch between 6 and 25 is in the data, not a drawing choice.`;
+}
+
+/* ---------- worked-example epsilon plane ---------- */
+function caseChart(){
+  const c=DATA.cases[caseIdx];
+  const W=520,H=320,P={l:62,r:18,t:20,b:50}, xw=W-P.l-P.r, yh=H-P.t-P.b;
+  const pts=c.A2.concat(c.A1);
+  const xMax=niceMax(Math.max(...pts.map(p=>p[0]))), yMax=niceMax(Math.max(...pts.map(p=>p[1]),1));
+  const X=v=>P.l+v/xMax*xw, Y=v=>P.t+(1-v/yMax)*yh;
+  let o=''; const G=4;
+  const fmtY = v => yMax<=5 ? (+v.toFixed(2)) : Math.round(v);
+  for(let g=0;g<=G;g++){
+    const y=P.t+g/G*yh;
+    o+=`<line x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}" stroke="var(--grid)"/>`+
+       `<text x="${P.l-8}" y="${y+3.5}" font-size="10" fill="var(--muted)" text-anchor="end">${fmtY(yMax-g/G*yMax)}</text>`;
+    const x=P.l+g/G*xw;
+    o+=`<text x="${x}" y="${H-28}" font-size="10" fill="var(--muted)" text-anchor="middle">${Math.round(g/G*xMax)}</text>`;
+  }
+  o+=`<text x="${P.l+xw/2}" y="${H-10}" font-size="10.5" fill="var(--muted)" text-anchor="middle">deviation (assignment changes) &#8594;</text>`;
+  o+=`<text transform="translate(14,${P.t+yh/2}) rotate(-90)" font-size="10.5" fill="var(--muted)" text-anchor="middle">overtime (min)</text>`;
+  if(c.A2.length>1){
+    o+=`<path d="${c.A2.map((p,i)=>(i?'L':'M')+X(p[0])+' '+Y(p[1])).join(' ')}" fill="none" stroke="var(--a2)" stroke-width="2" opacity=".55"/>`;
+  }
+  c.A2.forEach(p=>o+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3.4" fill="var(--a2)"><title>A2 cost vector: ${p[0]} changes, ${p[1]} min overtime</title></circle>`);
+  const pa2=c.pathA2[wIdx], pa1=c.pathA1[wIdx];
+  o+=`<circle cx="${X(pa2[0])}" cy="${Y(pa2[1])}" r="8" fill="none" stroke="var(--a2)" stroke-width="2.4"/>`;
+  o+=`<circle cx="${X(c.A1[0][0])}" cy="${Y(c.A1[0][1])}" r="7" fill="var(--a1)" stroke="var(--panel)" stroke-width="2">`+
+     `<title>A1 cost vector: ${c.A1[0][0]} changes, ${c.A1[0][1]} min overtime — the only one, at every weight</title></circle>`;
+  o+=`<circle cx="${X(pa1[0])}" cy="${Y(pa1[1])}" r="11.5" fill="none" stroke="var(--a1)" stroke-width="2.4"/>`;
+  const a1x = X(c.A1[0][0]), rightSide = a1x > P.l + xw*0.55;
+  o+=`<text x="${a1x + (rightSide?-16:16)}" y="${Y(c.A1[0][1])+4}" font-size="11.5" font-weight="700" `+
+     `fill="var(--a1)" text-anchor="${rightSide?'end':'start'}">A1 (${c.A1[0][0]}, ${c.A1[0][1]})</text>`;
+  if(c.A2.length>1){
+    const mid=c.A2[Math.floor(c.A2.length/2)];
+    o+=`<text x="${X(mid[0])+10}" y="${Y(mid[1])-8}" font-size="11.5" font-weight="700" fill="var(--a2)">A2 frontier (${c.A2.length})</text>`;
+  }else{
+    o+=`<text x="${a1x + (rightSide?-16:16)}" y="${Y(c.A1[0][1])-14}" font-size="11.5" font-weight="700" `+
+       `fill="var(--a2)" text-anchor="${rightSide?'end':'start'}">A2 holds the same single vector</text>`;
+  }
+  $('chCase').innerHTML=`<title id="chCaseT">Efficient cost vectors for disruption ${c.id}</title>`+
+    `<desc id="chCaseD">A1 holds one cost vector at ${c.A1[0][0]} changes and ${c.A1[0][1]} minutes of overtime. A2 holds ${c.A2.length} non-dominated cost vector${c.A2.length>1?'s':''}. The rings mark what each method selects at w4 = ${W4[wIdx]}.</desc>`+o;
+  $('capCase').innerHTML=`Rings mark the cost vector each method selects at <b>w4 = ${W4[wIdx]}</b>. `+
+    `A1's ring never moves; A2's does whenever its frontier holds more than one vector.`;
+  $('caseMeta').innerHTML=`<b>${c.label}</b><br>`+
+    `&rho; = ${c.rho}, seed ${c.seed}, absent caregiver ${c.absent} · ${c.meta.carers} active caregivers · `+
+    `${c.meta.elig} eligible disruptions in this scenario · epsilon grid [${c.meta.grid[0]}, ${c.meta.grid[1]}], `+
+    `${c.meta.gridN} value${c.meta.gridN>1?'s':''} · service loss U_common = 0 (qualified) · incumbent flat-feasible.`+
+    `<br><br>${c.note}`;
+  let rows=`<thead><tr><th>w4</th><th>A1 deviation</th><th>A1 overtime</th><th>A2 deviation</th><th>A2 overtime</th></tr></thead><tbody>`;
+  W4.forEach((w,i)=>{
+    rows+=`<tr${i===wIdx?' style="background:var(--panel2);font-weight:700"':''}><td>${w}</td>`+
+      `<td>${c.pathA1[i][0]}</td><td>${c.pathA1[i][1]}</td>`+
+      `<td>${c.pathA2[i][0]}</td><td>${c.pathA2[i][1]}</td></tr>`;
+  });
+  $('caseTable').innerHTML=rows+`</tbody>`;
+}
+
+/* ---------- static blocks ---------- */
+function renderStatic(){
+  const T=DATA.totals;
+  $('scopeStrip').innerHTML =
+    `<b>Read this first.</b> The evidence is one synthetic base instance, ${T.scenarios} derived scenarios and `+
+    `${T.disruptions} disruptions <b>nested inside</b> those scenarios — so nothing here is a disruption-level `+
+    `statistic. Slots are fixed and travel is only a workload proxy: no routing, no time-window propagation. `+
+    `The one interval reported is <b>descriptive</b>, from scenario-clustered resampling; it is not a `+
+    `significance test. The base instance is not redistributable and is not in this repository — what is `+
+    `provided is <a href="../deposit/"><code>deposit/</code></a>, the sealed stage outputs plus the script that `+
+    `derives every figure from them.`;
+
+  $('headline').innerHTML = [
+    ['', grp(T.disruptions), `disruptions, nested in ${T.scenarios} derived scenarios from one base instance`],
+    ['', grp(T.zero_drop), `qualified: no service lost under either recovery (${pct(T.zero_drop,T.disruptions)} of all)`],
+    ['a1', `${T.a1_singleton_eps_qualified} / ${T.zero_drop}`, 'qualified disruptions where A1&rsquo;s efficient set holds exactly one cost vector — all of them'],
+    ['a2', `${T.a2_multicost_eps_qualified} / ${T.zero_drop}`, `qualified disruptions where A2 holds more than one (${pct(T.a2_multicost_eps_qualified,T.zero_drop)})`],
+    ['a2', `${T.a2_responsive_qualified} / ${T.zero_drop}`, `qualified disruptions where the weight actually changes A2&rsquo;s chosen cost vector (${pct(T.a2_responsive_qualified,T.zero_drop)})`],
+    ['a1', `${T.a1_inert_qualified} / ${T.zero_drop}`, `qualified disruptions where A1&rsquo;s whole cost vector is unchanged across all six weights (${T.a1_inert_all} of ${T.disruptions} overall)`]
+  ].map(([cls,v,k])=>`<div class="stat ${cls}"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+
+  $('strat').innerHTML = [`<button type="button" data-i="-1">pooled</button>`]
+    .concat(DATA.byRho.map((r,i)=>`<button type="button" data-i="${i}">&rho; ${r.rho}</button>`)).join('');
+  $('ticks').innerHTML = W4.map((w,i)=>`<button type="button" data-i="${i}">${w}</button>`).join('');
+
+  const C=DATA.cos;
+  $('cosBox').innerHTML = [
+    ['a2', f2(C.point), 'minutes of extra overtime A2 accepts when the weight goes from 0 to 100 — its cost of stability'],
+    ['', `[${f2(C.lo)}, ${f2(C.hi)}]`, 'descriptive 95% interval, not a significance test'],
+    ['a1', `+${f2(DATA.a1Drift)}`, 'minutes: A1&rsquo;s own pooled overtime drift over the same weight range']
+  ].map(([cls,v,k])=>`<div class="stat ${cls}"><div class="v" style="font-size:${v.length>12?'17px':'25px'}">${v}</div><div class="k">${k}</div></div>`).join('');
+
+  $('cosNote').innerHTML = `<b>How to read the interval.</b> ${grp(C.resamples)} resamples over `+
+    `${C.clusters} shared seed clusters, equal weight across the ${C.strata} strata, rng seed ${C.seed}. The deposit `+
+    `records its own interpretation as <code>descriptive_sensitivity_not_population_inference</code>, and stores the `+
+    `p-value field as <code>NOT_COMPUTED</code>. It describes how much this estimate moves when the scenario clusters `+
+    `are resampled. It is not a test, and it supports no claim of significance.`;
+
+  $('caseSel').innerHTML = DATA.cases.map((c,i)=>`<button type="button" data-i="${i}">${c.tab}</button>`).join('');
+
+  let rt=`<thead><tr><th>&rho;</th><th>scen.</th><th>disr.</th><th>qualified</th>`+
+    `<th>A1 single-vector</th><th>A2 multi-vector</th><th>A2 weight-responsive</th>`+
+    `<th>cost of stability, median (IQR) min</th></tr></thead><tbody>`;
+  DATA.byRho.forEach(r=>{
+    rt+=`<tr><td>${r.rho}</td><td>${r.scen}</td><td>${r.disr}</td><td>${r.zero}</td>`+
+      `<td>${r.a1s} / ${r.zero}</td><td>${r.a2m} / ${r.zero}</td><td>${r.a2r} / ${r.zero}</td>`+
+      `<td>${f2(r.cos.median)} (${f2(r.cos.q1)}&ndash;${f2(r.cos.q3)})</td></tr>`;
+  });
+  const T2=DATA.totals;
+  rt+=`<tr style="font-weight:700;background:var(--panel2)"><td>all</td><td>${T2.scenarios}</td><td>${T2.disruptions}</td>`+
+    `<td>${T2.zero_drop}</td><td>${T2.a1_singleton_eps_qualified} / ${T2.zero_drop}</td>`+
+    `<td>${T2.a2_multicost_eps_qualified} / ${T2.zero_drop}</td><td>${T2.a2_responsive_qualified} / ${T2.zero_drop}</td>`+
+    `<td>${f2(DATA.cos.point)} pooled</td></tr></tbody>`;
+  $('rhoTable').innerHTML=rt;
+
+  $('scopeList').innerHTML = DATA.scope.map(s=>`<li>${s}</li>`).join('');
+  $('notClaimed').innerHTML = DATA.notClaimed.map(s=>`<li>${s}</li>`).join('');
+
+  let pt=`<thead><tr><th>Quantity shown on this page</th><th>Sealed file</th><th>How it is derived</th></tr></thead><tbody>`;
+  DATA.prov.forEach(([q,f,h])=>pt+=`<tr><td>${q}</td><td style="text-align:left"><code>${f}</code></td><td style="text-align:left">${h}</td></tr>`);
+  $('provTable').innerHTML=pt+`</tbody>`;
+
+  rhoChart();
+  histChart();
+
+  $('snapLine').innerHTML = `All eight sealed files carry the same snapshot id <code>${DATA.snap.slice(0,16)}&hellip;</code>, `+
+    `and the digests recorded in <code>deposit/code/build_formal_results.py</code> match the files as shipped. `+
+    `That is a consistency check on sealed outputs — it says the artefacts are the ones the paper was written from, `+
+    `not that the optimisation behind them is correct.`;
+}
+
+/* ---------- dynamic render ---------- */
+function render(){
+  const S = stratIdx<0 ? DATA.pooled : DATA.byRho[stratIdx];
+  const name = stratIdx<0 ? 'pooled over all six strata' : `&rho; = ${DATA.byRho[stratIdx].rho}`;
+  document.querySelectorAll('#strat button').forEach(b=>b.setAttribute('aria-pressed', String(+b.dataset.i===stratIdx)));
+  document.querySelectorAll('#ticks button').forEach(b=>b.setAttribute('aria-pressed', String(+b.dataset.i===wIdx)));
+  $('w4').value = wIdx;
+
+  lineChart('chDev','chDevT','chDevD',{
+    title:`Deviation against the weight grid (${name.replace('&rho;','rho')})`,
+    desc:`A1 changes from ${f2(S.A1.deviation[0])} to ${f2(S.A1.deviation[5])} assignment changes across the whole weight grid, while A2 changes from ${f2(S.A2.deviation[0])} to ${f2(S.A2.deviation[5])}.`,
+    yLabel:'deviation (assignment changes)', unit:'changes',
+    series:[{label:'A1',color:'var(--a1)',values:S.A1.deviation,above:false},
+            {label:'A2',color:'var(--a2)',values:S.A2.deviation,above:true}]});
+  lineChart('chOt','chOtT','chOtD',{
+    title:`Overtime against the weight grid (${name.replace('&rho;','rho')})`,
+    desc:`A1 changes from ${f1(S.A1.overtime[0])} to ${f1(S.A1.overtime[5])} minutes across the whole weight grid, while A2 changes from ${f1(S.A2.overtime[0])} to ${f1(S.A2.overtime[5])}.`,
+    yLabel:'overtime (min)', unit:'min',
+    series:[{label:'A1',color:'var(--a1)',values:S.A1.overtime,above:true},
+            {label:'A2',color:'var(--a2)',values:S.A2.overtime,above:false}]});
+
+  const dA1=S.A1.deviation, dA2=S.A2.deviation, oA1=S.A1.overtime, oA2=S.A2.overtime;
+  const spanA1d=Math.abs(dA1[5]-dA1[0]), spanA2d=Math.abs(dA2[5]-dA2[0]);
+  const spanA1o=Math.abs(oA1[5]-oA1[0]), spanA2o=Math.abs(oA2[5]-oA2[0]);
+  $('capDev').innerHTML=`Across w4 = 0 &rarr; 100, A1 moves ${f2(spanA1d)} assignment changes; A2 moves ${f2(spanA2d)}.`;
+  $('capOt').innerHTML=`Across w4 = 0 &rarr; 100, A1 moves ${f1(spanA1o)} min of overtime; A2 moves ${f1(spanA2o)} min.`;
+
+  $('sweepRead').innerHTML=[
+    ['','w4 = '+W4[wIdx], stratIdx<0?'pooled, equal weight per stratum':`stratum &rho; = ${DATA.byRho[stratIdx].rho}`],
+    ['a1',f2(dA1[wIdx]),'A1 deviation (assignment changes)'],
+    ['a1',f1(oA1[wIdx]),'A1 overtime (min)'],
+    ['a2',f2(dA2[wIdx]),'A2 deviation (assignment changes)'],
+    ['a2',f1(oA2[wIdx]),'A2 overtime (min)']
+  ].map(([cls,v,k])=>`<div class="ro"><div class="v" style="color:${cls==='a1'?'var(--a1)':cls==='a2'?'var(--a2)':'inherit'}">${v}</div><div class="k">${k}</div></div>`).join('');
+
+  $('sweepNote').innerHTML = stratIdx<0
+    ? `<b>Pooled.</b> A1's overtime moves ${f1(spanA1o)} min and its deviation ${f2(spanA1d)} changes across the entire `+
+      `weight grid — the curve is visibly flat. That residual drift comes entirely from the `+
+      `${DATA.totals.disruptions - DATA.totals.a1_inert_all} disruptions on which A1 is not inert, every one of them `+
+      `outside the theorem's conditions: on all ${DATA.totals.zero_drop} qualified disruptions A1's cost vector does not `+
+      `move at all. A2 moves ${f1(spanA2o)} min `+
+      `of overtime and ${f2(spanA2d)} changes over the same grid: the dial is doing something.`
+    : `<b>&rho; = ${DATA.byRho[stratIdx].rho}.</b> ${DATA.byRho[stratIdx].zero} of ${DATA.byRho[stratIdx].disr} disruptions `+
+      `in this stratum are qualified; A1 returns a single cost vector on every one of them. A2 returns more than one on `+
+      `${DATA.byRho[stratIdx].a2m} (${pct(DATA.byRho[stratIdx].a2m,DATA.byRho[stratIdx].zero)}), and the weight actually `+
+      `moves A2 on ${DATA.byRho[stratIdx].a2r}. Across the weight grid A1 moves ${f1(spanA1o)} min of overtime; A2 moves ${f1(spanA2o)}.`;
+
+  deltaChart();
+  caseChart();
+}
+
+/* ---------- wiring ---------- */
+renderStatic();
+$('strat').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;stratIdx=+b.dataset.i;render();});
+$('ticks').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;wIdx=+b.dataset.i;render();});
+$('caseSel').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;caseIdx=+b.dataset.i;
+  document.querySelectorAll('#caseSel button').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.i===caseIdx)));
+  caseChart();});
+$('w4').addEventListener('input',e=>{wIdx=+e.target.value;render();});
+document.querySelectorAll('#caseSel button').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.i===caseIdx)));
+
+(function theme(){
+  const root=document.documentElement;
+  let pref=null;
+  try{ pref=localStorage.getItem('ipr-theme'); }catch(e){}
+  if(pref==='dark'||pref==='light') root.setAttribute('data-theme',pref);
+  $('theme').addEventListener('click',()=>{
+    const cur=root.getAttribute('data-theme');
+    const isDark = cur==='dark' || (cur!=='light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const next = isDark?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{ localStorage.setItem('ipr-theme',next); }catch(e){}
+    render();
+  });
+})();
+
+render();
+</script>
+</body>
+</html>

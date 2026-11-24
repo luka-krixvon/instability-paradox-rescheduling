@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this code or the findings, please cite the preprint."
+title: "The Instability Paradox in Minimum-Disruption Dynamic Rescheduling"
+type: software
+authors:
+  - family-names: Chen
+    given-names: Teng-Ruei
+    orcid: "https://orcid.org/0000-0001-8995-334X"
+    affiliation: "Krixvon, Taipei 100, Taiwan"
+    email: luka@krixvon.com
+  - family-names: Lin
+    given-names: Chun-Cheng
+    orcid: "https://orcid.org/0000-0001-9073-593X"
+    affiliation: "Department of Industrial Engineering and Management, National Yang Ming Chiao Tung University, Hsinchu 300, Taiwan; International Master Program of Smart Manufacturing and Applied Information Science, National Chin-Yi University of Technology, Taichung 411, Taiwan; Department of Research and Development, Asia University, Taichung 413, Taiwan"
+    email: cclin321@nycu.edu.tw
+repository-code: "https://github.com/luka-krixvon/instability-paradox-rescheduling"
+license: MIT
+# version: v0.1.0          # set on first tagged release
+# date-released: 2026-XX-XX
+preferred-citation:
+  type: article
+  title: "The Instability Paradox in Minimum-Disruption Dynamic Rescheduling"
+  authors:
+    - family-names: Chen
+      given-names: Teng-Ruei
+      orcid: "https://orcid.org/0000-0001-8995-334X"
+      affiliation: "Krixvon, Taipei 100, Taiwan"
+    - family-names: Lin
+      given-names: Chun-Cheng
+      orcid: "https://orcid.org/0000-0001-9073-593X"
+      affiliation: "Department of Industrial Engineering and Management, National Yang Ming Chiao Tung University, Hsinchu 300, Taiwan; International Master Program of Smart Manufacturing and Applied Information Science, National Chin-Yi University of Technology, Taichung 411, Taiwan; Department of Research and Development, Asia University, Taichung 413, Taiwan"
+  year: 2026
+  # journal / arXiv id to be filled once the preprint is posted:
+  # url: "https://arxiv.org/abs/XXXX.XXXXX"
+  notes: "Preprint (V1). arXiv identifier to be added after posting."

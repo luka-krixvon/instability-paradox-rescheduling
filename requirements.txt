@@ -1,0 +1,6 @@
+# Reproduction environment (CPU only; no GPU, no Gurobi, no LLM/API key needed).
+# Exact MILPs use scipy.optimize.milp (HiGHS backend, bundled with scipy).
+numpy>=1.24
+pandas>=2.0
+scipy>=1.11
+matplotlib>=3.7

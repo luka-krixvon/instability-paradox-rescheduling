@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why assignment-only recovery ignores the weight — worked example</title>
+<meta name="description" content="A tiny home-care instance, enumerated exhaustively in the browser, showing why assignment-only recovery has one cost vector while displacement recovery can have several.">
+<style>
+  :root{
+    --bg:#f5f8f8; --bg2:#eaf1f2; --panel:#ffffff; --panel2:#fbfdfd;
+    --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0; --line2:#eef2f3;
+    --a1:#0f766e; --a1-soft:#e6f4f2; --a1-line:#bfe3dd;
+    --a2:#b45309; --a2-soft:#fdf3e0; --a2-line:#f3d59a;
+    --accent:#0f766e; --ot:#dc2626; --ot-soft:rgba(220,38,38,.16);
+    --kept:#e6f4f2; --kept-line:#bfe3dd; --kept-ink:#0b3b36;
+    --orph:#dcfce7; --orph-line:#16a34a; --orph-ink:#14532d;
+    --moved:#fdf3e0; --moved-line:#d97706; --moved-ink:#7c2d12;
+    --grid:#e8eef0; --shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06); --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0b1220; --bg2:#0e1726; --panel:#121c2b; --panel2:#16212f;
+      --ink:#e6edf3; --ink2:#c3cfdb; --muted:#93a4b6; --line:#243244; --line2:#1b2736;
+      --a1:#5eead4; --a1-soft:#10302d; --a1-line:#1f5750;
+      --a2:#fbbf24; --a2-soft:#352507; --a2-line:#6b4a0c;
+      --accent:#5eead4; --ot:#f87171; --ot-soft:rgba(248,113,113,.2);
+      --kept:#12302c; --kept-line:#1f5750; --kept-ink:#99f6e4;
+      --orph:#0f2e1d; --orph-line:#22c55e; --orph-ink:#86efac;
+      --moved:#352507; --moved-line:#d97706; --moved-ink:#fcd34d;
+      --grid:#22303f; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0b1220; --bg2:#0e1726; --panel:#121c2b; --panel2:#16212f;
+    --ink:#e6edf3; --ink2:#c3cfdb; --muted:#93a4b6; --line:#243244; --line2:#1b2736;
+    --a1:#5eead4; --a1-soft:#10302d; --a1-line:#1f5750;
+    --a2:#fbbf24; --a2-soft:#352507; --a2-line:#6b4a0c;
+    --accent:#5eead4; --ot:#f87171; --ot-soft:rgba(248,113,113,.2);
+    --kept:#12302c; --kept-line:#1f5750; --kept-ink:#99f6e4;
+    --orph:#0f2e1d; --orph-line:#22c55e; --orph-ink:#86efac;
+    --moved:#352507; --moved-line:#d97706; --moved-ink:#fcd34d;
+    --grid:#22303f; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC",sans-serif;
+    color:var(--ink);background:var(--bg);background-image:linear-gradient(170deg,var(--bg),var(--bg2));
+    min-height:100vh;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:20px 16px 56px}
+  a{color:var(--accent)}
+  code{background:var(--line2);padding:1px 5px;border-radius:5px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  header.top{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+  .brand h1{font-size:19px;margin:0 0 4px;line-height:1.25}
+  .brand p{margin:0;font-size:12.5px;color:var(--muted);max-width:62ch}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  .pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font:inherit;font-size:12px;
+    color:var(--ink2);box-shadow:var(--shadow);text-decoration:none;cursor:pointer}
+  .pill:hover{border-color:var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px}
+  .pad{padding:16px 18px}
+  .q{font-size:17px;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
+  .lead p{margin:0 0 9px;font-size:14px;color:var(--ink2)} .lead p:last-child{margin-bottom:0}
+  .sec{font-size:12px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);margin:26px 0 10px}
+  h2.h{font-size:16.5px;margin:0 0 6px} .sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+  .ctrls{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+  .lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;margin-bottom:7px}
+  .seg{display:flex;background:var(--line2);border-radius:10px;padding:3px;gap:3px;flex-wrap:wrap}
+  .seg button{border:none;background:transparent;padding:7px 12px;border-radius:8px;font:inherit;font-size:12.5px;
+    font-weight:600;color:var(--muted);cursor:pointer;text-align:left}
+  .seg button small{display:block;font-size:10px;font-weight:500;opacity:.85}
+  .seg button[aria-pressed="true"]{background:var(--panel);color:var(--accent);box-shadow:0 1px 4px rgba(15,23,42,.12)}
+  .seg button:focus-visible,.pill:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .wbox{flex:1;min-width:250px}
+  input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:6px;
+    background:linear-gradient(90deg,var(--a1),var(--a2));outline:none;margin:6px 0 0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;
+    background:var(--panel);border:3px solid var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(15,23,42,.25)}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--panel);border:3px solid var(--accent);cursor:pointer}
+  .ticks{display:flex;justify-content:space-between;margin-top:5px;gap:2px}
+  .ticks button{border:none;background:transparent;font:inherit;font-size:10.5px;color:var(--muted);cursor:pointer;padding:2px 5px;border-radius:5px}
+  .ticks button[aria-pressed="true"]{color:var(--accent);font-weight:800;background:var(--line2)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px} @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+  .panel-top{padding:14px 16px 11px;border-bottom:1px solid var(--line)}
+  .panel-top.m1{background:linear-gradient(180deg,var(--a1-soft),transparent)}
+  .panel-top.m2{background:linear-gradient(180deg,var(--a2-soft),transparent)}
+  .ptitle{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .ptitle h3{font-size:15px;margin:0}
+  .badge{font-size:10px;font-weight:800;letter-spacing:.3px;padding:3px 9px;border-radius:999px;text-transform:uppercase;border:1px solid}
+  .badge.one{background:var(--a1-soft);color:var(--a1);border-color:var(--a1-line)}
+  .badge.many{background:var(--a2-soft);color:var(--a2);border-color:var(--a2-line)}
+  .psub{font-size:11.5px;color:var(--muted);margin:6px 0 0}
+  .board{padding:10px 16px 4px}
+  .axis{position:relative;height:14px;margin:2px 0 4px 62px}
+  .axis .t{position:absolute;transform:translateX(-50%);font-size:9.5px;color:var(--muted);white-space:nowrap}
+  .nrow{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--line2)}
+  .nrow:last-child{border-bottom:none}
+  .ntag{width:54px;flex:0 0 54px;font-size:12px;font-weight:700}
+  .ntag small{display:block;font-size:9px;font-weight:500;color:var(--muted)}
+  .nrow.absent .ntag{color:var(--ot);text-decoration:line-through}
+  .lane{position:relative;flex:1;height:28px;background:var(--panel2);border-radius:7px;border:1px solid var(--line2);overflow:hidden}
+  .hstd,.hmax{position:absolute;top:0;bottom:0;border-left:1.5px dashed}
+  .hstd{border-color:#d97706} .hmax{border-color:var(--ot)}
+  .task{position:absolute;top:3px;height:21px;border-radius:5px;font-size:10px;font-weight:700;display:flex;
+    align-items:center;justify-content:center;border:1.5px solid;transition:left .18s ease,width .18s ease;overflow:hidden;white-space:nowrap}
+  .task.kept{background:var(--kept);border-color:var(--kept-line);color:var(--kept-ink)}
+  .task.orphan{background:var(--orph);border-color:var(--orph-line);color:var(--orph-ink)}
+  .task.moved{background:var(--moved);border-color:var(--moved-line);color:var(--moved-ink)}
+  .ot{position:absolute;top:0;bottom:0;background:var(--ot-soft)}
+  .otb{position:absolute;right:2px;top:-1px;font-size:8px;font-weight:800;color:#fff;background:var(--ot);border-radius:0 6px 0 6px;padding:0 4px}
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px 16px 14px}
+  .metric{border:1px solid var(--line);border-radius:10px;padding:7px 9px;background:var(--panel2);text-align:center}
+  .metric .k{font-size:10px;color:var(--muted)} .metric .v{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+  .metric.dev .v{color:var(--a1)} .metric.hot .v{color:var(--a2)}
+  .legend{padding:0 16px 10px;font-size:10.5px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+  .legend b{font-weight:700}
+  .note{border-radius:12px;padding:12px 14px;font-size:12.8px;line-height:1.6;border:1px solid}
+  .note.plain{background:var(--panel2);border-color:var(--line);color:var(--ink2)}
+  .note.a1{background:var(--a1-soft);border-color:var(--a1-line)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums}
+  th:first-child,td:first-child{text-align:left;font-variant-numeric:normal}
+  thead th{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:1px solid var(--line)}
+  .scroll{overflow-x:auto}
+  figure{margin:0} figcaption{font-size:11.5px;color:var(--muted);margin-top:7px}
+  .key{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
+  .key i{width:16px;height:3px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:middle}
+  .foot{margin-top:28px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--line);padding-top:16px}
+  ol.steps{margin:10px 0 0;padding-left:20px;font-size:13.5px;color:var(--ink2)} ol.steps li{margin-bottom:7px}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <h1>Why assignment-only recovery ignores the stability weight</h1>
+    <p>A hand-checkable instance, enumerated exhaustively in your browser. It illustrates the structure behind the
+       paper's result; it is <b>not</b> a result from the paper, and no number here appears in the paper.</p>
+  </div>
+  <nav class="toolbar" aria-label="Page links">
+    <a class="pill" href="index.html">&larr; Audit results</a>
+    <a class="pill" href="https://doi.org/10.66977/xsci.2611.0042">Paper · DOI 10.66977/xsci.2611.0042</a>
+    <a class="pill" href="../deposit/">Recomputable deposit</a>
+    <button class="pill" id="theme" type="button" aria-label="Switch colour theme">Theme</button>
+  </nav>
+</header>
+
+<section class="card lead"><div class="pad">
+  <p class="q">A caregiver calls in sick. Two recovery policies face the same disruption — the only difference is
+     what each is <em>allowed to move</em>.</p>
+  <p><span style="color:var(--a1);font-weight:800">A1, assignment-only.</span> Every incumbent visit stays with the
+     caregiver who already had it. Only the orphaned visits are placed.
+     <span style="color:var(--a2);font-weight:800">A2, displacement allowed.</span> Incumbent visits may be moved too,
+     to make room.</p>
+  <p>Both minimise the same objective — <code>1 &times; overtime minutes + w4 &times; assignment changes +
+     5000 &times; unserved visits</code> — and deviation is the symmetric difference between the chosen assignment
+     set and the incumbent one, exactly the counting rule the paper uses. <b>Drag w4 and watch which panel moves.</b></p>
+</div></section>
+
+<section class="card"><div class="pad">
+  <div class="ctrls">
+    <div>
+      <div class="lbl" id="scLbl">instance</div>
+      <div class="seg" role="group" aria-labelledby="scLbl" id="scenario"></div>
+    </div>
+    <div class="wbox">
+      <div class="lbl"><label for="w4">stability weight w4</label></div>
+      <input type="range" id="w4" min="0" max="5" step="1" value="0">
+      <div class="ticks" role="group" aria-label="Weight grid" id="ticks"></div>
+    </div>
+  </div>
+  <p class="sub" id="scDesc" style="margin:12px 0 0"></p>
+</div></section>
+
+<div class="grid2">
+  <section class="card" style="display:flex;flex-direction:column">
+    <div class="panel-top m1">
+      <div class="ptitle"><h3>A1 — assignment-only</h3><span class="badge one" id="badge1"></span></div>
+      <p class="psub" id="sub1"></p>
+    </div>
+    <div class="board"><div class="axis" id="axis1"></div><div id="rows1"></div></div>
+    <div class="legend">
+      <span><b style="color:var(--kept-ink)">&#9632;</b> kept</span>
+      <span><b style="color:var(--orph-ink)">&#9632;</b> orphaned visit, placed</span>
+      <span><b style="color:var(--moved-ink)">&#9632;</b> incumbent visit moved</span>
+      <span><b style="color:#d97706">&#8942;</b> standard hours</span>
+      <span><b style="color:var(--ot)">&#8942;</b> hard cap</span>
+    </div>
+    <div class="metrics" id="m1" style="margin-top:auto"></div>
+  </section>
+
+  <section class="card" style="display:flex;flex-direction:column">
+    <div class="panel-top m2">
+      <div class="ptitle"><h3>A2 — displacement allowed</h3><span class="badge many" id="badge2"></span></div>
+      <p class="psub" id="sub2"></p>
+    </div>
+    <div class="board"><div class="axis" id="axis2"></div><div id="rows2"></div></div>
+    <div class="legend">
+      <span><b style="color:var(--kept-ink)">&#9632;</b> kept</span>
+      <span><b style="color:var(--orph-ink)">&#9632;</b> orphaned visit, placed</span>
+      <span><b style="color:var(--moved-ink)">&#9632;</b> incumbent visit moved</span>
+      <span><b style="color:#d97706">&#8942;</b> standard hours</span>
+      <span><b style="color:var(--ot)">&#8942;</b> hard cap</span>
+    </div>
+    <div class="metrics" id="m2" style="margin-top:auto"></div>
+  </section>
+</div>
+
+<section class="card"><div class="pad">
+  <h2 class="h">The efficient set, and what the weight selects</h2>
+  <p class="sub">Every recovery that serves the same visits is enumerated; dominated cost vectors are dropped.
+     What survives is the whole menu a weight could ever choose from.</p>
+  <div class="grid2">
+    <figure><svg id="chart" viewBox="0 0 520 270" width="100%" role="img" aria-labelledby="chT chD"></svg>
+      <figcaption id="chCap"></figcaption>
+      <div class="key">
+        <span><i style="background:var(--a1)"></i>A1</span>
+        <span><i style="background:var(--a2)"></i>A2</span>
+        <span>solid: overtime &nbsp;·&nbsp; dashed: deviation</span>
+      </div>
+    </figure>
+    <div>
+      <div class="scroll"><table id="setTable"><caption class="vh">Non-dominated cost vectors by method</caption></table></div>
+      <div class="note plain" id="setNote" style="margin-top:12px"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="card"><div class="pad">
+  <h2 class="h">Check the counting by hand</h2>
+  <ol class="steps" id="handCheck"></ol>
+  <div class="note a1" style="margin-top:14px">
+    <b>That is the counting invariant.</b> Under assignment-only recovery, with the incumbent still feasible and every
+    orphaned visit placeable, the set of changed assignments is fixed by the event. Deviation is therefore the same
+    number for every candidate recovery, so <code>w4 &times; deviation</code> adds the same constant to all of them and
+    cannot reorder anything. The service-maximal efficient set holds exactly <b>one cost vector</b> — several
+    assignment vectors may tie on it, as they do on the left above. A weight cannot create a frontier that the
+    feasible set does not contain. Once displacement is allowed <em>and</em> it strictly lowers attainable overtime at
+    the same service level, at least two non-dominated cost vectors exist, and the weight genuinely selects among them.
+  </div>
+</div></section>
+
+<section class="card"><div class="pad">
+  <h2 class="h">What this page is, and is not</h2>
+  <div class="note plain">
+    <b>It is</b> a deliberately tiny instance, solved by exhaustive enumeration in your browser, chosen so the
+    arithmetic can be checked by hand. <b>It is not</b> a result from the paper: no magnitude on this page appears
+    there, and the browser enumerator is not the solver the paper used. It is also not evidence that any
+    implementation is correct — it only shows what the structure implies.
+    <b>The paper's evidence</b> is 518 disruptions nested in 30 derived scenarios from one synthetic base instance,
+    with fixed slots and travel as a workload proxy, no routing and no time-window propagation; on all 488 qualified
+    disruptions A1's efficient set held exactly one cost vector.
+    <a href="index.html">See those results &rarr;</a>
+  </div>
+</div></section>
+
+<footer class="foot">
+  <p><b>Paper.</b> Teng-Ruei Chen &amp; Chun-Cheng Lin, “Auditing Stability Controls in Dynamic Workforce
+     Reassignment: Assignment-Only versus Displacement Recovery in Home Healthcare”, XSci preprint,
+     <a href="https://doi.org/10.66977/xsci.2611.0042">DOI 10.66977/xsci.2611.0042</a>.</p>
+  <p>The paper's own numbers come from the sealed stage outputs in
+     <a href="../deposit/"><code>deposit/run/results/</code></a>, not from this page.
+     <a href="index.html">Audit results</a>.</p>
+</footer>
+
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Toy recovery model — illustrative only, nothing here comes from the paper.
+      minimise  OT_WEIGHT × overtime  +  w4 × deviation  +  UNSERVED_WEIGHT × unserved
+      overtime_n = max(0, load_n - hStd),  load_n <= hMax
+      deviation  = |chosen assignment set  symmetric-difference  incumbent set|
+   Both policies are solved by exhaustive enumeration over the candidate sets.
+   ------------------------------------------------------------------------ */
+const OT_WEIGHT = 1, UNSERVED_WEIGHT = 5000;
+const W4 = [0,5,10,20,50,100];
+
+const SCENARIOS = [
+  {
+    key:'slack', tab:'Slack absorbs it<small>both policies collapse</small>',
+    desc:'A single visit is orphaned and a colleague has room for it inside standard hours. Nothing can be traded: '+
+         'both policies reach the same single cost vector, so the weight has nothing to select. In the paper’s data '+
+         'this is the common case at loose capacity.',
+    nurses:['Ana','Ben','Cal'], absent:['Dee'], axisMax:320, hStd:180, hMax:300,
+    tasks:['v1','v2','v3','v4','orph'],
+    dur:{v1:90,v2:90,v3:120,v4:60,orph:90},
+    base:{v1:'Ana',v2:'Ana',v3:'Ben',v4:'Cal',orph:'Dee'},
+    cand:{v1:['Ana','Cal'],v2:['Ana','Ben'],v3:['Ben','Cal'],v4:['Cal','Ana'],orph:['Ana','Ben','Cal']},
+    sub1:'Only the orphaned visit may be placed. Cal has room for it inside standard hours.',
+    sub2:'Incumbent visits may be moved as well — but there is no overtime left to remove.'
+  },
+  {
+    key:'frontier', tab:'Displacement pays<small>A1 pinned, A2 trades</small>',
+    desc:'The orphaned visit is long, and the only two caregivers qualified for it are already at standard hours. '+
+         'Assignment-only recovery must accept the overtime. Displacement can shed it a visit at a time — each move '+
+         'costs two more assignment changes and removes a little less overtime than the last.',
+    nurses:['Ana','Rae','Hal','Ivy','Jo','Kit'], absent:['Dee'], axisMax:500, hStd:240, hMax:480,
+    tasks:['orph','a1','a2','a3','a4','r1','h1','h2','h3','h4'],
+    dur:{orph:240,a1:120,a2:70,a3:35,a4:15,r1:240,h1:120,h2:170,h3:205,h4:225},
+    base:{orph:'Dee',a1:'Ana',a2:'Ana',a3:'Ana',a4:'Ana',r1:'Rae',h1:'Hal',h2:'Ivy',h3:'Jo',h4:'Kit'},
+    cand:{orph:['Ana','Rae'],a1:['Ana','Hal'],a2:['Ana','Ivy'],a3:['Ana','Jo'],a4:['Ana','Kit'],
+          r1:['Rae'],h1:['Hal'],h2:['Ivy'],h3:['Jo'],h4:['Kit']},
+    sub1:'Ana or Rae can take the orphaned visit. Either way exactly one assignment changes.',
+    sub2:'Ana’s own visits can be handed to colleagues with room, one at a time.'
+  }
+];
+SCENARIOS.forEach(s=>{
+  s.xbar = new Set(s.tasks.filter(t=>!s.absent.includes(s.base[t])).map(t=>s.base[t]+'|'+t));
+  s.orphans = s.tasks.filter(t=>s.absent.includes(s.base[t]));
+});
+
+const $ = id => document.getElementById(id);
+let sIdx = 1, wIdx = 0;
+const cache = {};
+
+function options(s, t, mode){
+  if(mode==='A1' && !s.orphans.includes(t)) return [s.base[t]];
+  return s.cand[t].concat(['_U']);
+}
+function enumerate(s, mode){
+  const key = s.key+'|'+mode;
+  if(cache[key]) return cache[key];
+  const opts = s.tasks.map(t=>options(s,t,mode));
+  const out = [];
+  const pick = new Array(s.tasks.length);
+  (function rec(k){
+    if(k===s.tasks.length){ evaluate(); return; }
+    for(const n of opts[k]){ pick[k]=n; rec(k+1); }
+  })(0);
+  function evaluate(){
+    const load = {}; s.nurses.forEach(n=>load[n]=0);
+    let unserved = 0;
+    for(let i=0;i<s.tasks.length;i++){
+      const n = pick[i]; if(n==='_U'){ unserved++; continue; }
+      load[n] += s.dur[s.tasks[i]];
+    }
+    for(const n of s.nurses) if(load[n] > s.hMax + 1e-9) return;
+    let ot = 0; for(const n of s.nurses) ot += Math.max(0, load[n]-s.hStd);
+    const chosen = new Set();
+    for(let i=0;i<s.tasks.length;i++) if(pick[i]!=='_U') chosen.add(pick[i]+'|'+s.tasks[i]);
+    let dev = 0;
+    chosen.forEach(c=>{ if(!s.xbar.has(c)) dev++; });
+    s.xbar.forEach(b=>{ if(!chosen.has(b)) dev++; });
+    const assign = {}; s.tasks.forEach((t,i)=>assign[t]=pick[i]);
+    out.push({unserved, ot, dev, load, assign});
+  }
+  const uMin = Math.min(...out.map(x=>x.unserved));
+  const atLevel = out.filter(x=>x.unserved===uMin);
+  const seen = new Map();
+  atLevel.forEach(x=>{ const k=x.dev+'|'+x.ot; if(!seen.has(k)) seen.set(k,{dev:x.dev,ot:x.ot,n:0}); seen.get(k).n++; });
+  const pts = [...seen.values()];
+  const nd = pts.filter(p=>!pts.some(q=>(q.dev!==p.dev||q.ot!==p.ot) && q.dev<=p.dev && q.ot<=p.ot))
+                .sort((a,b)=>a.dev-b.dev);
+  const res = {uMin, atLevel, nd};
+  cache[key] = res; return res;
+}
+function select(s, mode, w4){
+  const {atLevel} = enumerate(s, mode);
+  let best = null;
+  for(const x of atLevel){
+    const obj = OT_WEIGHT*x.ot + w4*x.dev + UNSERVED_WEIGHT*x.unserved;
+    if(!best || obj < best.obj-1e-9 || (Math.abs(obj-best.obj)<1e-9 && x.dev < best.x.dev)) best = {obj, x};
+  }
+  return {...best.x, obj:best.obj};
+}
+function sweep(s, mode){ return W4.map(w=>{ const x=select(s,mode,w); return {w, dev:x.dev, ot:x.ot}; }); }
+
+/* ---------------- boards ---------------- */
+function renderAxis(id, s){
+  const el = $(id); el.innerHTML='';
+  [[0,'0'],[s.hStd,s.hStd+' min · standard'],[s.hMax,s.hMax+' · cap']].forEach(([v,lab])=>{
+    el.insertAdjacentHTML('beforeend', `<div class="t" style="left:${v/s.axisMax*100}%">${lab}</div>`);
+  });
+}
+function renderBoard(id, s, sol){
+  const el = $(id); el.innerHTML='';
+  const A = s.axisMax;
+  const byN = {}; s.nurses.forEach(n=>byN[n]=[]);
+  s.tasks.forEach(t=>{ const n = sol.assign[t]; if(n!=='_U') byN[n].push(t); });
+  s.absent.forEach(ab=>{
+    el.insertAdjacentHTML('beforeend',
+      `<div class="nrow absent"><div class="ntag">${ab}<small>absent</small></div><div class="lane">`+
+      `<div class="hstd" style="left:${s.hStd/A*100}%"></div><div class="hmax" style="left:${s.hMax/A*100}%"></div></div></div>`);
+  });
+  s.nurses.forEach(n=>{
+    const ts = byN[n];
+    const load = ts.reduce((q,t)=>q+s.dur[t],0);
+    const ot = Math.max(0, load-s.hStd);
+    let blocks = `<div class="hstd" style="left:${s.hStd/A*100}%"></div><div class="hmax" style="left:${s.hMax/A*100}%"></div>`;
+    if(ot>0) blocks += `<div class="ot" style="left:${s.hStd/A*100}%;width:${ot/A*100}%"></div>`;
+    let off = 0;
+    ts.forEach(t=>{
+      const isOrph = s.orphans.includes(t);
+      const kept = s.xbar.has(n+'|'+t);
+      const cls = isOrph ? 'orphan' : (kept ? 'kept' : 'moved');
+      const w = s.dur[t]/A*100;
+      blocks += `<div class="task ${cls}" style="left:${off/A*100}%;width:${w}%" title="${t} · ${s.dur[t]} min">`+
+                `${w>7?t:''}</div>`;
+      off += s.dur[t];
+    });
+    if(ot>0) blocks += `<span class="otb">OT ${ot}</span>`;
+    el.insertAdjacentHTML('beforeend',
+      `<div class="nrow"><div class="ntag">${n}<small>${load} min</small></div><div class="lane">${blocks}</div></div>`);
+  });
+}
+function renderMetrics(id, sol){
+  $(id).innerHTML =
+    `<div class="metric dev"><div class="k">assignment changes</div><div class="v">${sol.dev}</div></div>`+
+    `<div class="metric hot"><div class="k">overtime (min)</div><div class="v">${sol.ot}</div></div>`+
+    `<div class="metric"><div class="k">objective</div><div class="v" style="font-size:17px">${sol.obj}</div></div>`;
+}
+
+/* ---------------- chart ---------------- */
+function niceMax(v){ if(v<=0) return 1; const e=Math.pow(10,Math.floor(Math.log10(v))); const m=v/e;
+  const s = m<=1?1:m<=1.5?1.5:m<=2?2:m<=2.5?2.5:m<=5?5:10; return s*e; }
+function renderChart(s){
+  const A=sweep(s,'A1'), B=sweep(s,'A2');
+  const W=520,H=270,P={l:52,r:52,t:18,b:46}, xw=W-P.l-P.r, yh=H-P.t-P.b;
+  const otMax = niceMax(Math.max(1,...A.map(p=>p.ot),...B.map(p=>p.ot)));
+  const dvMax = niceMax(Math.max(1,...A.map(p=>p.dev),...B.map(p=>p.dev)));
+  const X=i=>P.l+i/(W4.length-1)*xw, YO=v=>P.t+(1-v/otMax)*yh, YD=v=>P.t+(1-v/dvMax)*yh;
+  let o=''; const G=4;
+  for(let g=0;g<=G;g++){
+    const y=P.t+g/G*yh;
+    o+=`<line x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}" stroke="var(--grid)"/>`+
+       `<text x="${P.l-7}" y="${y+3.5}" font-size="10" fill="var(--muted)" text-anchor="end">${Math.round(otMax-g/G*otMax)}</text>`+
+       `<text x="${W-P.r+7}" y="${y+3.5}" font-size="10" fill="var(--muted)" text-anchor="start">${(+(dvMax-g/G*dvMax).toFixed(1))}</text>`;
+  }
+  W4.forEach((w,i)=>o+=`<text x="${X(i)}" y="${H-22}" font-size="10" fill="var(--muted)" text-anchor="middle">${w}</text>`);
+  o+=`<text x="${P.l+xw/2}" y="${H-6}" font-size="10.5" fill="var(--muted)" text-anchor="middle">stability weight w4 &#8594;</text>`;
+  o+=`<text transform="translate(12,${P.t+yh/2}) rotate(-90)" font-size="10" fill="var(--muted)" text-anchor="middle">overtime (min)</text>`;
+  o+=`<text transform="translate(${W-10},${P.t+yh/2}) rotate(-90)" font-size="10" fill="var(--muted)" text-anchor="middle">assignment changes</text>`;
+  o+=`<line x1="${X(wIdx)}" y1="${P.t}" x2="${X(wIdx)}" y2="${P.t+yh}" stroke="var(--muted)" stroke-dasharray="3 3" opacity=".55"/>`;
+  const path=(arr,Y,k)=>arr.map((p,i)=>(i?'L':'M')+X(i)+' '+Y(p[k])).join(' ');
+  o+=`<path d="${path(A,YD,'dev')}" fill="none" stroke="var(--a1)" stroke-width="2" stroke-dasharray="5 4" opacity=".9"/>`;
+  o+=`<path d="${path(B,YD,'dev')}" fill="none" stroke="var(--a2)" stroke-width="2" stroke-dasharray="5 4" opacity=".9"/>`;
+  o+=`<path d="${path(A,YO,'ot')}" fill="none" stroke="var(--a1)" stroke-width="2.8"/>`;
+  o+=`<path d="${path(B,YO,'ot')}" fill="none" stroke="var(--a2)" stroke-width="2.8"/>`;
+  [['A1',A,'var(--a1)'],['A2',B,'var(--a2)']].forEach(([lab,arr,col])=>{
+    arr.forEach((p,i)=>{
+      o+=`<circle cx="${X(i)}" cy="${YO(p.ot)}" r="${i===wIdx?5:3}" fill="${col}" ${i===wIdx?'stroke="var(--panel)" stroke-width="1.6"':''}>`+
+         `<title>${lab} · w4=${p.w} · overtime ${p.ot} min</title></circle>`;
+      o+=`<circle cx="${X(i)}" cy="${YD(p.dev)}" r="${i===wIdx?4:2.4}" fill="${col}" opacity=".7">`+
+         `<title>${lab} · w4=${p.w} · ${p.dev} assignment changes</title></circle>`;
+    });
+  });
+  const flatA1 = A.every(p=>p.ot===A[0].ot && p.dev===A[0].dev);
+  const flatA2 = B.every(p=>p.ot===B[0].ot && p.dev===B[0].dev);
+  $('chart').innerHTML = `<title id="chT">Overtime and assignment changes across the weight grid for both policies</title>`+
+    `<desc id="chD">A1 stays at ${A[0].dev} changes and ${A[0].ot} minutes of overtime at every weight. `+
+    `A2 ${flatA2 ? `also stays at ${B[0].dev} changes and ${B[0].ot} minutes` :
+      `moves from ${B[0].dev} changes and ${B[0].ot} minutes at w4=0 to ${B[5].dev} changes and ${B[5].ot} minutes at w4=100`}.</desc>` + o;
+  $('chCap').innerHTML = flatA1
+    ? (flatA2 ? 'Both lines are flat: neither policy has a second cost vector for the weight to choose.'
+              : `A1's lines are flat across the whole grid. A2 moves from (${B[0].dev} changes, ${B[0].ot} min) to (${B[5].dev}, ${B[5].ot}).`)
+    : '';
+}
+
+/* ---------------- tables and notes ---------------- */
+function renderSets(s){
+  const e1 = enumerate(s,'A1'), e2 = enumerate(s,'A2');
+  const sel1 = select(s,'A1',W4[wIdx]), sel2 = select(s,'A2',W4[wIdx]);
+  const rows = [];
+  e1.nd.forEach(p=>rows.push(['A1',p,sel1.dev===p.dev&&sel1.ot===p.ot]));
+  e2.nd.forEach(p=>rows.push(['A2',p,sel2.dev===p.dev&&sel2.ot===p.ot]));
+  let t=`<thead><tr><th>policy</th><th>assignment changes</th><th>overtime (min)</th><th>tying plans</th><th>chosen at w4=${W4[wIdx]}</th></tr></thead><tbody>`;
+  rows.forEach(([m,p,on])=>{
+    t+=`<tr${on?' style="background:var(--panel2);font-weight:700"':''}>`+
+       `<td><span style="color:${m==='A1'?'var(--a1)':'var(--a2)'};font-weight:800">${m}</span></td>`+
+       `<td>${p.dev}</td><td>${p.ot}</td><td>${p.n}</td><td>${on?'&#9679;':''}</td></tr>`;
+  });
+  $('setTable').innerHTML = t+`</tbody>`;
+  $('badge1').textContent = e1.nd.length===1 ? '1 cost vector' : e1.nd.length+' cost vectors';
+  $('badge2').textContent = e2.nd.length===1 ? '1 cost vector' : e2.nd.length+' cost vectors';
+  const tie1 = e1.nd.reduce((q,p)=>q+p.n,0);
+  $('setNote').innerHTML =
+    `<b>A1 has ${e1.nd.length} non-dominated cost vector${e1.nd.length>1?'s':''}</b>`+
+    (tie1>1 ? ` — reached by ${tie1} different assignment plans, which tie on it exactly. ` : `. `)+
+    `<b>A2 has ${e2.nd.length}.</b> `+
+    (e2.nd.length===1
+      ? `Displacement does not lower attainable overtime here, so the condition the paper needs for a second vector fails, and the weight is inert for both policies.`
+      : `Because displacement strictly lowers attainable overtime at the same service level, the weight has a real menu to choose from — and the sweep above shows it choosing.`);
+}
+function renderHandCheck(s){
+  const e1 = enumerate(s,'A1');
+  const orph = s.orphans.map(t=>`<code>${t}</code>`).join(', ');
+  const placements = e1.atLevel.length;
+  const items = [
+    `The absent caregiver held ${s.orphans.length} visit (${orph}). Under A1 every other visit stays exactly where it was.`,
+    `So any A1 recovery is the incumbent set plus ${s.orphans.length} new pairing. The symmetric difference against the incumbent is <b>${e1.nd[0].dev}</b> — whichever colleague takes it.`,
+    `There are ${placements} feasible A1 recoveries here. They differ in overtime, never in the number of changes.`,
+    `Because the deviation column is constant, <code>w4 &times; deviation</code> adds the same amount to all of them. Ranking them by the objective is the same as ranking them by overtime alone, for every w4.`,
+    `Only the cheapest-overtime one survives domination: <b>(${e1.nd[0].dev} change${e1.nd[0].dev===1?'':'s'}, ${e1.nd[0].ot} min)</b>. That single point is A1's entire efficient set.`
+  ];
+  $('handCheck').innerHTML = items.map(x=>`<li>${x}</li>`).join('');
+}
+
+/* ---------------- top-level render ---------------- */
+function render(){
+  const s = SCENARIOS[sIdx];
+  document.querySelectorAll('#scenario button').forEach(b=>b.setAttribute('aria-pressed', String(+b.dataset.i===sIdx)));
+  document.querySelectorAll('#ticks button').forEach(b=>b.setAttribute('aria-pressed', String(+b.dataset.i===wIdx)));
+  $('w4').value = wIdx;
+  $('scDesc').innerHTML = s.desc;
+  $('sub1').textContent = s.sub1; $('sub2').textContent = s.sub2;
+  const w4 = W4[wIdx];
+  const sol1 = select(s,'A1',w4), sol2 = select(s,'A2',w4);
+  renderAxis('axis1',s); renderAxis('axis2',s);
+  renderBoard('rows1',s,sol1); renderBoard('rows2',s,sol2);
+  renderMetrics('m1',sol1);   renderMetrics('m2',sol2);
+  renderChart(s); renderSets(s); renderHandCheck(s);
+}
+
+$('scenario').innerHTML = SCENARIOS.map((s,i)=>`<button type="button" data-i="${i}">${s.tab}</button>`).join('');
+$('ticks').innerHTML = W4.map((w,i)=>`<button type="button" data-i="${i}">${w}</button>`).join('');
+$('scenario').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;sIdx=+b.dataset.i;render();});
+$('ticks').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;wIdx=+b.dataset.i;render();});
+$('w4').addEventListener('input',e=>{wIdx=+e.target.value;render();});
+
+(function theme(){
+  const root=document.documentElement;
+  let pref=null; try{ pref=localStorage.getItem('ipr-theme'); }catch(e){}
+  if(pref==='dark'||pref==='light') root.setAttribute('data-theme',pref);
+  $('theme').addEventListener('click',()=>{
+    const cur=root.getAttribute('data-theme');
+    const isDark = cur==='dark' || (cur!=='light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const next = isDark?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{ localStorage.setItem('ipr-theme',next); }catch(e){}
+    render();
+  });
+})();
+
+render();
+</script>
+</body>
+</html>

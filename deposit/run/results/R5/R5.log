@@ -1,0 +1,9 @@
+SNAP_ID=d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60 STAGE=R5
+COMMAND=["/usr/local/bin/python3", "/work/snapshot/experiments/journal_p0/r5_stats.py", "--e4-input", "/results/R1b/e4_raw.csv", "--rho-manifest", "/work/snapshot/experiments/journal_p0/rho_manifest.csv", "--output-dir", "${STAGE_ROOT}", "--snap-id", "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60", "--formal"]
+/work/snapshot/experiments/journal_p0/r5_stats.py:130: DtypeWarning: Columns (141,214) have mixed types. Specify dtype option on import or set low_memory=False.
+  frame = pd.read_csv(path)
+[R5] PASS dynamic scenarios=30 disruptions=518 raw_rows=6216
+[R5] PASS scenario aggregation precedes every across-scenario summary
+[R5] PASS bootstrap n=10000 seed=20260730 shared-index-sha256=59955a2d7e9445b60947cd405d43de5b89d93068b51fd0be2c00c552eed1ba32
+[R5] PASS no per-rho or pooled cross-rho p-value was computed by default
+[R5] NOTE regression/traceability evidence is not proof or validation of the science

@@ -1,0 +1,647 @@
+{
+  "attempt_id": "recovery-06",
+  "attempt_root_name": "d6c9fa4de2c8-recovery-06",
+  "claim_scope": "technical execution integrity and solver-reported status-0 unique-lattice-cell validation only; not a mathematical exact-optimality proof",
+  "container": {
+    "args": [
+      "/opt/dchhr/container_entrypoint.py",
+      "--archive",
+      "/input/SNAP_d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60.tar",
+      "--snap-id",
+      "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+      "--result-root",
+      "/results",
+      "--stage",
+      "primary-sharded"
+    ],
+    "docker_wait_receipt_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "error": "",
+    "exit_code": 0,
+    "finished_at": "2026-08-09T09:55:03.176753289Z",
+    "id": "0c38fc850170ec9846dd69b35fc9c3304141eeb8a06dcd0d9d9c9932f938be61",
+    "inspect_receipt_sha256": "15e584f71c944601e94f3d0bd559e7b742effd49a7e61e10d49b230d25ac7d0f",
+    "isolation": {
+      "cap_add": [],
+      "cap_drop_all": true,
+      "memory_bytes": 25769803776,
+      "memory_swap_bytes": 25769803776,
+      "nano_cpus": 12000000000,
+      "network_mode": "none",
+      "no_new_privileges": true,
+      "pids_limit": 4096,
+      "privileged": false,
+      "readonly_rootfs": true,
+      "restart_policy": "no",
+      "tmpfs": {
+        "/tmp": "rw,noexec,nosuid,nodev,size=8g,uid=1000,gid=1000,mode=1777",
+        "/work": "rw,nosuid,nodev,size=4g,uid=1000,gid=1000,mode=0755"
+      },
+      "user": "1000:1000"
+    },
+    "mounts": [
+      {
+        "destination": "/input/SNAP_d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60.tar",
+        "rw": false,
+        "source": "/home/ubuntu/llm-dchhr-rerun/d6c9fa4de2c8-recovery-06/snap/SNAP_d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60.tar",
+        "type": "bind"
+      },
+      {
+        "destination": "/results",
+        "rw": true,
+        "source": "/home/ubuntu/llm-dchhr-rerun/d6c9fa4de2c8-recovery-06/results",
+        "type": "bind"
+      }
+    ],
+    "name": "dchhr-d6c9fa4de2c8-primary",
+    "oom_killed": false,
+    "path": "python3",
+    "running": false,
+    "started_at": "2026-08-09T05:20:09.773188746Z",
+    "status": "exited"
+  },
+  "cross_stage_bindings": {
+    "R1_to_R1b": {
+      "R1_owner_merge_receipt_sha256": "a76633dea8abd5357ca15d0d524f0452d85051ed6d574d5ffb9e155de2a68105",
+      "R1_shard_orchestration_sha256": "cc8ed9eea2ef53041a7857471dd600b0b5cb6ab53dfc65c487e353ed68769e6e",
+      "R1_stage_hash_inventory_sha256": "4865fd3b842e622e3b0e083f2513b14a37afa5951ba02b5af485814180c17c43",
+      "passed": true,
+      "required_stage": "R1"
+    },
+    "R1b_to_R5": {
+      "R1b_e4_raw_sha256": "532d1ccf826101ff128abc8f8eb18ef8f9d9611b442fd808a23f273f11e8e2c5",
+      "passed": true
+    }
+  },
+  "epistemic_note": "Hashes and execution gates establish byte-level traceability, atomic stage completion, registered solver-status acceptance, and receipt consistency. Non-structural R1b roles validate a solver-reported status-0 optimum against one unique exact-readback lattice cell; they do not supply an independent mathematical lower-bound proof. These gates are not proof of scientific truth, external validity, absence of fraud, or publication readiness.",
+  "evidence_files": [
+    {
+      "bytes": 10212,
+      "path": "receipts/final/container_inspect.json",
+      "sha256": "15e584f71c944601e94f3d0bd559e7b742effd49a7e61e10d49b230d25ac7d0f"
+    },
+    {
+      "bytes": 2,
+      "path": "receipts/final/docker_wait_exit_code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 3531,
+      "path": "receipts/final/image_inspect.json",
+      "sha256": "a9817055c980136a8a435e1d38e246cc0b0a1bbc50b82d531fd3517b309bc6ef"
+    },
+    {
+      "bytes": 215531,
+      "path": "receipts/prelaunch/verify_and_seal_recovery06.py",
+      "sha256": "7036fadf190673e54eb1e525e8b77b195e770d5b8744594a82735245d9ac8cf2"
+    }
+  ],
+  "gate_summary": {
+    "failed": 0,
+    "failed_gate_ids": [],
+    "passed": 36,
+    "passed_gate_ids": [
+      "snap.archive_sha256",
+      "snap.manifest_first",
+      "snap.member_set",
+      "snap.recovery06_scope",
+      "image.binding",
+      "image.frozen_id",
+      "image.platform",
+      "container.exit_state",
+      "container.exit_code",
+      "container.oom",
+      "container.isolation",
+      "container.privileged",
+      "container.cap_add",
+      "container.no_new_privileges",
+      "container.pids_limit",
+      "container.tmpfs",
+      "container.mounts",
+      "container.mount_type",
+      "results.stage_scope",
+      "stages.inventory_exact",
+      "preflight.all_17",
+      "r0.family",
+      "R1.six_shards",
+      "R1.owner_merge",
+      "R1.science",
+      "R1b.upstream_binding",
+      "R1b.six_shards",
+      "R1b.owner_merge",
+      "R1b.science",
+      "R1b.binary64_round_trip",
+      "R1b.same_lattice_level",
+      "R5.hashes",
+      "R5.science",
+      "results.no_partial",
+      "receipts.regular",
+      "verifier.evidence_binding"
+    ],
+    "total": 36
+  },
+  "generated_by": {
+    "evidence_path": "receipts/prelaunch/verify_and_seal_recovery06.py",
+    "runtime_path": "/home/ubuntu/llm-dchhr-rerun/d6c9fa4de2c8-recovery-06/receipts/prelaunch/verify_and_seal_recovery06.py",
+    "sha256": "7036fadf190673e54eb1e525e8b77b195e770d5b8744594a82735245d9ac8cf2"
+  },
+  "image": {
+    "architecture": "amd64",
+    "base_digest_label": "sha256:70fbdeb75b0d071778ea1df4353ac959118ae8031bc5be33a95d1b8ea1fb8f08",
+    "id": "sha256:815b531a353b1a24fdb0f9f923dba5c190340771faa4dcee0a049ffb4a40a47d",
+    "inspect_receipt_sha256": "a9817055c980136a8a435e1d38e246cc0b0a1bbc50b82d531fd3517b309bc6ef",
+    "os": "linux",
+    "reference": "sha256:815b531a353b1a24fdb0f9f923dba5c190340771faa4dcee0a049ffb4a40a47d"
+  },
+  "owner_merges": {
+    "R1": {
+      "orchestration": {
+        "all_six_shards_completed_before_merge": true,
+        "merge_exit_code": 0,
+        "orchestration_path": "results/R1/r1_shard_orchestration.json",
+        "orchestration_sha256": "cc8ed9eea2ef53041a7857471dd600b0b5cb6ab53dfc65c487e353ed68769e6e",
+        "passed": true,
+        "rho_values": [
+          0.45,
+          0.55,
+          0.65,
+          0.75,
+          0.85,
+          0.95
+        ],
+        "shards": [
+          {
+            "artifact_sha256": {
+              "eps_frontier.csv": "21320e65126eb8d07adc684cd6a9f1ed725e8fb18f1069dcf2949eadfd59435d",
+              "eps_oracle_validation.csv": "2674108d04b93788a6724a4d74041d2fef0bed7d6ce69140ab84482ca741125d",
+              "eps_range.csv": "48304bc7f1462f856ca8b6010e234b134fb0bbaa205cf8f20c36a755beea8435",
+              "eps_solver_diagnostics.csv": "a4c04bad2e4d581fa8fe1c738d31a46c14bd874a8ef8474226f496e40c75764d"
+            },
+            "directory": "shards/rho_0p45",
+            "inventory_files": 5,
+            "inventory_sha256": "8244dc4d13d783cfab53478932734c678d78bf73f8579cb55fce90a6de8ba895",
+            "rho": 0.45
+          },
+          {
+            "artifact_sha256": {
+              "eps_frontier.csv": "4f9f370f8fa3ab9b6d3a0bc8fc02e3dd9ae43d68770fde11639083afdb1c806d",
+              "eps_oracle_validation.csv": "c3030c78029412812d605a282a5a225491e633c43eb70dee42df02ac3b65e08e",
+              "eps_range.csv": "d5c2297091ddbe79a6026ba8e7666f5f8d9f64f9afbe49e87254db63e26d9c55",
+              "eps_solver_diagnostics.csv": "90555c795fe0d1067dac480df68f0f4e2dd9295f6da194b48bc88ddf115a9f04"
+            },
+            "directory": "shards/rho_0p55",
+            "inventory_files": 5,
+            "inventory_sha256": "7e58d9f58073a382975aa9696aecc4d321a2ec42e5a384f9bfb1d7518f0ad2fd",
+            "rho": 0.55
+          },
+          {
+            "artifact_sha256": {
+              "eps_frontier.csv": "5ca001fa074157e3ad50a504e061bb65d122e6a117696911acb96fdadebae929",
+              "eps_oracle_validation.csv": "e636f174abf38129deae9d60c17d9968c79a0455192800c2f311be0af8795c3d",
+              "eps_range.csv": "c207f67f71caa901d8d291b066bbceee04531e617069ede56ab965060dbffd15",
+              "eps_solver_diagnostics.csv": "96fb2299eee3d2e0c4d6644cd8120c88ed51c00b761dfb5853b56b253c11e8c6"
+            },
+            "directory": "shards/rho_0p65",
+            "inventory_files": 5,
+            "inventory_sha256": "3e1bf8d8078031165ab8dc25d4e5baf7c6a24b81437ff1e1694f97e83a7e7ddf",
+            "rho": 0.65
+          },
+          {
+            "artifact_sha256": {
+              "eps_frontier.csv": "8d63fe39f39c13dd44d475b9a0679df3d99b80d58060f58e5e1bcd6962951e8f",
+              "eps_oracle_validation.csv": "bffeb50cbc4627601daac7d76ad0ca685ca496454fff0189f4ef811e542502bf",
+              "eps_range.csv": "8210c1b1f6bdfa62122d9df024a3ad780f13ada92c0850c3b0e5b475d5f87ba7",
+              "eps_solver_diagnostics.csv": "a270a8d0efab4953290bcd6252044d47df8809b3d1a32105bd983bdd9393818b"
+            },
+            "directory": "shards/rho_0p75",
+            "inventory_files": 5,
+            "inventory_sha256": "434a5237491ae2447e151280f761e41208625df4bcc94e5210103a1ee601ffbc",
+            "rho": 0.75
+          },
+          {
+            "artifact_sha256": {
+              "eps_frontier.csv": "7e4978152dd2438df70fe8e27a37a58d323074f543a557e204e3ba1a0c193b7c",
+              "eps_oracle_validation.csv": "e6a55d162a5f3235862794af2efcf8831c2f0cf101fdf3bae38bb6b78151eff7",
+              "eps_range.csv": "8d8564de92fa41f6a9c9e52d46a5a0ebf73e460e75c8f0f68f23c3db899349ec",
+              "eps_solver_diagnostics.csv": "2250dcbe48b8bdf3fb8df88fc781a09c00dd7f1868d96eaa91cc4bc8bad61f58"
+            },
+            "directory": "shards/rho_0p85",
+            "inventory_files": 5,
+            "inventory_sha256": "8ac63d530812c6836b168507721a81dd6e74cb1086663abc34aef3ba1f7dab98",
+            "rho": 0.85
+          },
+          {
+            "artifact_sha256": {
+              "eps_frontier.csv": "b9baf9f813a64d737683f22ee5c4ef7a1ea569988fd7dd8cc375f3d35de7a4ce",
+              "eps_oracle_validation.csv": "098dd00bf971112e1a08db4f195c0740a31dfeb99cf2a77c90ad04ef9dd0c631",
+              "eps_range.csv": "8e0dc69655b3163c89753ecfdd7b95dbddb11c04c7931829a02235bfb146a41f",
+              "eps_solver_diagnostics.csv": "4aedc17738576f082ecfd00fb2b59083dc159a644d19ba7366f440b0e1ab0174"
+            },
+            "directory": "shards/rho_0p95",
+            "inventory_files": 5,
+            "inventory_sha256": "c0146133340a88f576938f5e34328108ca102fa99aea327e440206e2dd2f9385",
+            "rho": 0.95
+          }
+        ]
+      },
+      "owner_receipt": {
+        "eligible_disruptions": 518,
+        "frontier_rows": 32372,
+        "full_axes_equal": true,
+        "merged_artifact_hashes_match": true,
+        "mode": "formal_six_rho_shard_validation_and_rebuild_without_resolve",
+        "passed": true,
+        "receipt_path": "results/R1/r1_shard_merge_receipt.json",
+        "receipt_sha256": "a76633dea8abd5357ca15d0d524f0452d85051ed6d574d5ffb9e155de2a68105",
+        "scenarios": 30,
+        "source_shard_hashes_match": true
+      }
+    },
+    "R1b": {
+      "orchestration": {
+        "all_six_shards_completed_before_merge": true,
+        "merge_exit_code": 0,
+        "orchestration_path": "results/R1b/r1b_shard_orchestration.json",
+        "orchestration_sha256": "af04f2935132461774201a237c5d5700844c42961dfcca3ae3682a8baf1d51ad",
+        "passed": true,
+        "rho_values": [
+          0.45,
+          0.55,
+          0.65,
+          0.75,
+          0.85,
+          0.95
+        ],
+        "shards": [
+          {
+            "artifact_sha256": {
+              "e4_raw.csv": "b365bff1052a6ba151693ccee362aa364c9820c27d23faa62966ea0e6f3ba71b",
+              "e4_solver_diagnostics.csv": "e79f9b214399a90602dcc20d16369585d1301b23d769c7e2adf299b26c093f5a",
+              "e4_summary.csv": "ca906a6c7851199cfb8c700c8c36605730ad32ce80cb364072d83b1f10aced58",
+              "e4_summary_provenance.csv": "8ce144da1c2380f1cb698d5d70aaac2418124504b0385db69685fbd865848df4"
+            },
+            "directory": "shards/rho_0p45",
+            "inventory_files": 5,
+            "inventory_sha256": "03aeaf8e8385114f968ba348996169ca6631f9356139154ff4920b04a9e70a68",
+            "rho": 0.45
+          },
+          {
+            "artifact_sha256": {
+              "e4_raw.csv": "6abf0cfafc13d7588169d150dab0bf88590863eac1e06378c35c6af109c34220",
+              "e4_solver_diagnostics.csv": "d01458b6193c6aa52b69ea086000cc8bf397bd08e75da739b83825b2482242de",
+              "e4_summary.csv": "b3f6ac2fe95cd11a86305b4d230820b92c60a7cc3015af92ca552591783cbbc4",
+              "e4_summary_provenance.csv": "1d7b9b4d106cab27af39c0e2876a0c0c3e033a48aa07b92a205264103f48260a"
+            },
+            "directory": "shards/rho_0p55",
+            "inventory_files": 5,
+            "inventory_sha256": "c1484220b9f5e109b01d764b4ee482e295fe13563f82a40fabe2e11bbce6b2da",
+            "rho": 0.55
+          },
+          {
+            "artifact_sha256": {
+              "e4_raw.csv": "0be5f03879bfee8982d1d8daf3fa7b81b98bc7d32f0a02ac613f64201f37a7ab",
+              "e4_solver_diagnostics.csv": "4c825407c84391d8fb9a89df60856de68c1baac3983ea22d4513c507a05ed790",
+              "e4_summary.csv": "044a1e3332fee3605b11cfda49457f7a45e5a555d012bc96cabd406f2559884e",
+              "e4_summary_provenance.csv": "9d5f9e79e46c6fcc41f8220b32b8be37361f457283bec01ce6f736d382112575"
+            },
+            "directory": "shards/rho_0p65",
+            "inventory_files": 5,
+            "inventory_sha256": "dc9908443a18579adbf642fe8f0117c5164c19d1e935ec03431e71a0908bc80b",
+            "rho": 0.65
+          },
+          {
+            "artifact_sha256": {
+              "e4_raw.csv": "309c782f213db19c484ff312faeabe3d770c699fc69e9d180dde0f1984653f6e",
+              "e4_solver_diagnostics.csv": "137d1303f35f81113561553e48cb8fae15883bc3936dd346d4f8e184e3644f36",
+              "e4_summary.csv": "cca09ebb3dcb4df4974ba95a748515139eb6b0f43f79ba7177cf8ff1e5eee0bd",
+              "e4_summary_provenance.csv": "97bddd1df0b678a2bddc803db0641ce98a5890cdf20332ec0a202d6311e3dbcd"
+            },
+            "directory": "shards/rho_0p75",
+            "inventory_files": 5,
+            "inventory_sha256": "57b6a0b6164edf81c6c939a737bd59dd00552a94d3be97d460eeed4dad205420",
+            "rho": 0.75
+          },
+          {
+            "artifact_sha256": {
+              "e4_raw.csv": "493dc26678d5f26038443cc0d296a1e9e9cfa8099cd654b8e4fe29b2a72d0ca6",
+              "e4_solver_diagnostics.csv": "2cadee77adf20ff07fd758894f9b805a58a0bc7728e10b95f6d2f0abdf75acf9",
+              "e4_summary.csv": "04be81a8f3fbe43a32f83244aa4a2dbe9dcb53e782f3fa995694db621076c5d2",
+              "e4_summary_provenance.csv": "d0ab50dc0dcec8b34a1784b2de2fb9ff5d977a0bbc4e0b72f5412dfb3a42dceb"
+            },
+            "directory": "shards/rho_0p85",
+            "inventory_files": 5,
+            "inventory_sha256": "72b5c766580548b348e3904591ea118d36fc7a60811e8164488afc178b779b36",
+            "rho": 0.85
+          },
+          {
+            "artifact_sha256": {
+              "e4_raw.csv": "acab4025a177932b77b07d7a6af5680d402ffa632ce1382180ef8855ee61febd",
+              "e4_solver_diagnostics.csv": "36a74ec5644efaee688b5ac430d6a53d31ccd3bd455249e143005977479af848",
+              "e4_summary.csv": "5a949a1bdd01ffbf6f989a5aff9424ee8f7d52fb4c0e458537d17adb5bfc6854",
+              "e4_summary_provenance.csv": "3021aec93965f57d2d3cd0e188d3ba305a3ad4c888151f9248ea0c649cc6a2d8"
+            },
+            "directory": "shards/rho_0p95",
+            "inventory_files": 5,
+            "inventory_sha256": "bd6d7e0596e02f2729607c6d2722c8b9117564a524a03d2a373cd780f69363c1",
+            "rho": 0.95
+          }
+        ]
+      },
+      "owner_receipt": {
+        "artifact_hashes_match_orchestration": true,
+        "passed": true,
+        "receipt_path": "results/R1b/e4_shard_receipts.csv",
+        "receipt_sha256": "87f7c6ebb8e316ae1da7dec8e14d7acc6a2570797fddefc91e8425d5f3e23155",
+        "rho_values": [
+          0.45,
+          0.55,
+          0.65,
+          0.75,
+          0.85,
+          0.95
+        ],
+        "rows": 6
+      }
+    }
+  },
+  "prior_attempts": [
+    {
+      "attempt": "recovery-03",
+      "disposition": "REJECTED_NOT_CONSUMED",
+      "reason": "exit_code_2_and_no_promoted_R1b_or_R5"
+    },
+    {
+      "attempt": "recovery-04",
+      "disposition": "REJECTED_NOT_CONSUMED",
+      "reason": "exit_code_2_R1_complete_but_R1b_partial_only_no_owner_merge_or_R5_and_new_SNAP_required"
+    },
+    {
+      "R1": "COMPLETE_NOT_CONSUMED",
+      "R1b": {
+        "completed_partial_shards": [
+          0.45,
+          0.55
+        ],
+        "failed_shards": [
+          0.65,
+          0.75,
+          0.85,
+          0.95
+        ],
+        "owner_merge_started": false,
+        "status": "PARTIAL_NOT_CONSUMED"
+      },
+      "R5": "NOT_STARTED",
+      "attempt": "recovery-05",
+      "disposition": "REJECTED_NOT_CONSUMED",
+      "exit_code": 2,
+      "oom_killed": false,
+      "reason": "exit_code_2_R1_complete_R1b_partial_only_0p45_0p55_no_owner_merge_no_R5_new_SNAP_required"
+    },
+    {
+      "attempt": "recovery-06-smoke-02",
+      "coordinate": "rho=0.75,seed=5,absent=4,method=A2,role=lex4_minD,stage=D",
+      "disposition": "REJECTED_SMOKE_ONLY_NOT_CONSUMED",
+      "exit_code": 1,
+      "oom_killed": false,
+      "reason": "the immutable B-P residual exceeded the unchanged historical 128-ULP v3 premise; no result artifact is authorized",
+      "snap_id": "49811ff8ab15cd8c23a9974037997e0c9d25b52c80e3175b77963a3636549a5b"
+    }
+  ],
+  "profile": "primary-sharded-recovery06",
+  "schema": "llm-dchhr-recovery06-global-seal-v1",
+  "scientific_execution_gates": {
+    "R1": {
+      "diagnostic_rows": 68888,
+      "frontier_rows": 32372,
+      "oracle_all_pass": true,
+      "oracle_max_abs_W_diff": 0.0,
+      "oracle_rows": 32372,
+      "passed": true,
+      "proven_optimal": true,
+      "range_rows": 518,
+      "solver_status_codes": [
+        0
+      ],
+      "stop_reason": "proven_optimal"
+    },
+    "R1b": {
+      "all_roles_have_mathematical_exact_proof": false,
+      "diagnostic_rows": 19684,
+      "disruptions": 518,
+      "exact_certificate_methods": [
+        "attained_structural_lower_bound_v1",
+        "solver_status0_lattice_consistency_v1"
+      ],
+      "lattice_validation_all_pass": true,
+      "passed": true,
+      "raw_P_B_C_identities_checked": true,
+      "raw_rows": 6216,
+      "shard_receipts_repeated_per_row": true,
+      "solver_primal_same_level_rule": "directed-up abs(F-P), abs(B-P), and abs(F-B) must each be strictly smaller than half the declared lattice step; this validates a code-0 solver-reported optimum but is not an exact mathematical proof",
+      "solver_reported_optimal": true,
+      "solver_roles_checked": [
+        "generic",
+        "weighted",
+        "w_refine",
+        "tie_break",
+        "umin_A1",
+        "umin_A2"
+      ],
+      "solver_status_codes": [
+        0
+      ],
+      "solver_vector_gate_authority": "SNAP-pinned live execution only; X/res.x unavailable for post-hoc replay",
+      "solver_vector_same_level_rule": "before adding C, directed-up abs(X-P) and abs(F-X), where X=c@res.x is reconstructed live, must each be strictly smaller than half the declared lattice step; the certificate independently checks F against P",
+      "status0_claim_scope": "conditional solver-status and unique-lattice-cell consistency; not an independent lower-bound proof and not a proof that the floating-point solver is correct",
+      "status0_lattice_method": "solver_status0_lattice_consistency_v1",
+      "status0_proves_exact_optimality": false,
+      "stop_reason": "proven_optimal",
+      "structural_attainment_proves_exact_optimality": true
+    },
+    "R5": {
+      "bootstrap_rows": 13,
+      "by_rho_rows": 78,
+      "consumed_R1b_e4_raw_sha256": "532d1ccf826101ff128abc8f8eb18ef8f9d9611b442fd808a23f273f11e8e2c5",
+      "dynamic_disruptions": 518,
+      "dynamic_scenarios": 30,
+      "output_hashes_match": true,
+      "passed": true,
+      "per_rho_p_values": "NOT_COMPUTED",
+      "pooled_cross_rho_p_value": "NOT_COMPUTED",
+      "scenario_effect_rows": 390
+    },
+    "pre_pipeline": {
+      "environment_log": "SNAP-bound",
+      "passed": true,
+      "preflight_commands": 17,
+      "preflight_exit_policy": "all child commands landed under exit-0 stage",
+      "r0_generated_family_files": 60,
+      "r0_scenarios": 30,
+      "registered_rhos": [
+        0.45,
+        0.55,
+        0.65,
+        0.75,
+        0.85,
+        0.95
+      ],
+      "registered_seeds": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  },
+  "snap": {
+    "archive_manifest": {
+      "all_members_verified": true,
+      "authority": true,
+      "base_image_linux_amd64_manifest": "sha256:70fbdeb75b0d071778ea1df4353ac959118ae8031bc5be33a95d1b8ea1fb8f08",
+      "canonical_container_root": "/work/snapshot",
+      "files": 151,
+      "pinned_recovery06_members_verified": 18,
+      "schema": "llm-dchhr-snap-v1",
+      "sha256": "22cc515da942be22953bfb5992295ce57975d464c31ee9d8a539013fd1654a91",
+      "solver_vector_live_gate": {
+        "live_vector_gate": {
+          "authority": "SNAP-pinned live execution only; X/res.x unavailable for post-hoc replay",
+          "coordinate_wise_proof": false,
+          "method": "live_objective_same_lattice_cell_v1",
+          "persisted": false,
+          "rule": "before adding C, directed-up abs(X-P) and abs(F-X), where X=c@res.x is reconstructed live, must each be strictly smaller than half the declared lattice step; the certificate independently checks F against P"
+        },
+        "status0_lattice_validation": {
+          "bound_ulps": 0,
+          "claim_scope": "conditional solver-status and unique-lattice-cell consistency; not an independent lower-bound proof and not a proof that the floating-point solver is correct",
+          "legacy_v3_formal_authority": false,
+          "method": "solver_status0_lattice_consistency_v1",
+          "proves_exact_optimality": false
+        }
+      }
+    },
+    "archive_path": "snap/SNAP_d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60.tar",
+    "archive_sha256": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+    "filename_matches_id": true,
+    "id": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+    "source_root_manifest": {
+      "consumed": false,
+      "entries": 144,
+      "policy": "preserve for forensic diff only; never use it to validate recovery-06 and never overwrite it with the tar-internal manifest",
+      "sha256": "01b6487456d2ffaabdc3ca06bbbafa1defaedf3f15252a41442b400d1450b3b1",
+      "status": "STALE_NOT_AUTHORITY"
+    }
+  },
+  "stage_scope": {
+    "actual": [
+      "environment",
+      "preflight",
+      "R0_generator",
+      "R1",
+      "R1b",
+      "R5"
+    ],
+    "failure_receipts": [],
+    "missing": [],
+    "nonregular_paths": [],
+    "partial_paths": [],
+    "regular_files": 178,
+    "required": [
+      "environment",
+      "preflight",
+      "R0_generator",
+      "R1",
+      "R1b",
+      "R5"
+    ],
+    "unexpected": []
+  },
+  "stages": {
+    "R0_generator": {
+      "actual_files_excluding_inventory": 62,
+      "declared_schema": "llm-dchhr-formal-stage-hashes-v1",
+      "declared_snap_id": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+      "declared_stage": "R0-generator",
+      "extra": [],
+      "inventory_path": "results/R0_generator/stage_hashes.json",
+      "inventory_sha256": "47e94eda9332df99b3fb45ec7b7bcb7e200b22b1c4e9671d6138018dacb5ac21",
+      "listed_files": 62,
+      "missing": [],
+      "passed": true,
+      "sha256_mismatch": [],
+      "size_mismatch": []
+    },
+    "R1": {
+      "actual_files_excluding_inventory": 43,
+      "declared_schema": "llm-dchhr-formal-stage-hashes-v1",
+      "declared_snap_id": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+      "declared_stage": "R1",
+      "extra": [],
+      "inventory_path": "results/R1/stage_hashes.json",
+      "inventory_sha256": "4865fd3b842e622e3b0e083f2513b14a37afa5951ba02b5af485814180c17c43",
+      "listed_files": 43,
+      "missing": [],
+      "passed": true,
+      "sha256_mismatch": [],
+      "size_mismatch": []
+    },
+    "R1b": {
+      "actual_files_excluding_inventory": 43,
+      "declared_schema": "llm-dchhr-formal-stage-hashes-v1",
+      "declared_snap_id": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+      "declared_stage": "R1b",
+      "extra": [],
+      "inventory_path": "results/R1b/stage_hashes.json",
+      "inventory_sha256": "9c711c013cc68f594a035a937b8008e421cdd7f7ce220a9358b91225c6adbed8",
+      "listed_files": 43,
+      "missing": [],
+      "passed": true,
+      "sha256_mismatch": [],
+      "size_mismatch": []
+    },
+    "R5": {
+      "actual_files_excluding_inventory": 6,
+      "declared_schema": "llm-dchhr-formal-stage-hashes-v1",
+      "declared_snap_id": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+      "declared_stage": "R5",
+      "extra": [],
+      "inventory_path": "results/R5/stage_hashes.json",
+      "inventory_sha256": "e52fc1064c30862cf054090ac5d569659ac9d9f941b63ad1e8af9c0c1a3ce86f",
+      "listed_files": 6,
+      "missing": [],
+      "passed": true,
+      "sha256_mismatch": [],
+      "size_mismatch": []
+    },
+    "environment": {
+      "actual_files_excluding_inventory": 1,
+      "declared_schema": "llm-dchhr-formal-stage-hashes-v1",
+      "declared_snap_id": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+      "declared_stage": "environment",
+      "extra": [],
+      "inventory_path": "results/environment/stage_hashes.json",
+      "inventory_sha256": "5e40d18495ff40dbebc81a60cfd4c63043ac58dc813b77aeae20650ccbc2a23f",
+      "listed_files": 1,
+      "missing": [],
+      "passed": true,
+      "sha256_mismatch": [],
+      "size_mismatch": []
+    },
+    "preflight": {
+      "actual_files_excluding_inventory": 17,
+      "declared_schema": "llm-dchhr-formal-stage-hashes-v1",
+      "declared_snap_id": "d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213d0865f2980c60",
+      "declared_stage": "preflight",
+      "extra": [],
+      "inventory_path": "results/preflight/stage_hashes.json",
+      "inventory_sha256": "fa108fb9a53ee571fd5a26b5342c7495bfb0d11f875299d80b303e82298acd54",
+      "listed_files": 17,
+      "missing": [],
+      "passed": true,
+      "sha256_mismatch": [],
+      "size_mismatch": []
+    }
+  },
+  "verdict": "PASS"
+}
