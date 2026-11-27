@@ -1,0 +1,2 @@
+rho_target,seed,hhcp,sol,note,N,rho_global,rho_used_mean,rho_used_max,src_sha256,feasible,unplaced
+0.5,901,H_epse4_A.csv,S_epse4_A.csv,formal metadata fixture,3,0.5,0.5,0.5,c098dd8608a1a16bae33fa81882b53bb817099217c0c93ca65db352ba9bc3fbe,true,0

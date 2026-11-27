@@ -1,0 +1,43 @@
+#(days),#(patients),#(nurse),#(tasks),#(nurse class),loca_x,local_y
+2,4,4,8,3,4000,4000
+
+#(patients) in each slot
+slot 0,slot 1,slot 2,slot 3,slot 4,slot 5,
+2,1,1,0,0,0,
+
+patient,x,y,requested slot,P1_gender,P1_Weights,P2_age,P2_Weights,P3_Language,P3_Weights,P4_smoke,P4_Weights,#(tasks),task list
+0,100,200,0,1,4,1,3,0,0,0,0,2,0,1,
+1,300,400,0,0,2,1,3,1,3,1,2,2,2,3,
+2,500,600,1,0,4,1,1,0,0,1,2,2,4,5,
+3,700,800,2,1,1,0,2,1,1,0,3,2,6,7,
+nurse,x,y,class,P1_gender,P2_age,P3_Language,P4_smoke,#(slot),slot list,,,,,,,,,,,,,,#(skills),skill list
+0,10,20,0,0,35,0,1,3,0,1,2,2,0,1,
+1,30,40,1,1,40,0,0,3,0,1,2,2,0,1,
+2,50,60,2,0,28,1,1,3,0,1,2,2,0,1,
+3,70,80,0,1,50,0,1,3,0,1,2,2,0,1,
+task,required skill,time,#(nurses),nurse list(Candidate solution)
+0,0,90,2,0,1,
+1,1,90,2,0,1,
+2,0,90,2,1,2,
+3,1,90,2,1,2,
+4,0,90,2,2,3,
+5,1,90,2,2,3,
+6,0,90,2,0,3,
+7,1,90,2,0,3,
+Candidate solution,Score
+0,0.400
+1,0.410
+2,0.420
+3,0.430
+4,0.440
+5,0.450
+6,0.460
+7,0.470
+8,0.480
+9,0.490
+10,0.500
+11,0.510
+12,0.520
+13,0.530
+14,0.540
+15,0.550

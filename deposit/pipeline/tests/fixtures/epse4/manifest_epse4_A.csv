@@ -1,0 +1,2 @@
+rho_target,seed,hhcp,sol,note
+0.0,901,H_epse4_A.csv,S_epse4_A.csv,synthetic S2 fixture -- NOT a rho-family instance; rho_target/seed are labels only

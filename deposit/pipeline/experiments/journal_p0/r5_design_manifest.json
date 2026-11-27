@@ -1,0 +1,135 @@
+{
+  "stage": "R5",
+  "owner_script": "experiments/journal_p0/r5_stats.py",
+  "status": "DESIGN; formal outputs require a validated R1b artifact and a SNAP identifier",
+  "input_artifacts": {
+    "primary": "R1b/e4_raw.csv",
+    "scenario_manifest": "experiments/journal_p0/rho_manifest.csv",
+    "disruption_axis_source": "the sol file named by each rho_manifest row",
+    "forbidden": [
+      "e4_summary.csv",
+      "scalability_size.csv",
+      "scalability_tightness.csv",
+      "rolling_raw.csv"
+    ]
+  },
+  "design_grid": {
+    "rho_levels": [0.45, 0.55, 0.65, 0.75, 0.85, 0.95],
+    "seed_labels": [1, 2, 3, 4, 5],
+    "methods": ["A1", "A2"],
+    "w4_sweep": [0, 5, 10, 20, 50, 100],
+    "t_now": 4,
+    "slots_per_day": 3,
+    "absence_rule": "all_active_future_task_holders",
+    "expected_disruption_count": "DYNAMIC: recompute from every committed S file; no literal total is accepted as authority",
+    "expected_raw_rows": "DYNAMIC: sum(disruptions_by_scenario) * len(methods) * len(w4_sweep)"
+  },
+  "r1b_acceptance": {
+    "primary_key": ["rho", "seed", "absent", "method", "w4"],
+    "required_measure_columns": ["deviation", "overtime", "U", "unserved"],
+    "common_service_columns": ["U_min_A1", "U_min_A2", "U_common", "U"],
+    "coverage_evidence_columns": [
+      "eligible_disruption",
+      "eligible_disruptions_in_scenario",
+      "absence_rule",
+      "absence_cap_mode"
+    ],
+    "legacy_alias_rule": "unserved must equal U on every row",
+    "common_service_rule": "U_min_A1, U_min_A2, and U_common are identical across the two regimes and all weights of one disruption; every row has U == U_common",
+    "nesting_rule": "checked A1 subset A2 implies U_min_A2 <= U_min_A1 and hence U_common == U_min_A1",
+    "required_solver_evidence": {
+      "weighted_solver_status_code": 0,
+      "weighted_proven_optimal": true,
+      "tie_break_solver_status_code": 0,
+      "tie_break_proven_optimal": true,
+      "umin_A1_solver_status_code": 0,
+      "umin_A1_proven_optimal": true,
+      "umin_A2_solver_status_code": 0,
+      "umin_A2_proven_optimal": true,
+      "solver_status_code": 0,
+      "proven_optimal": true
+    },
+    "required_zero_status_chains": [
+      "solver_status_chain",
+      "u_min_solver_status_chain",
+      "weighted_group_status_codes",
+      "tie_break_group_status_codes",
+      "solver_group_status_codes"
+    ],
+    "complete_chain_json": "solver_group_complete_status_chains_json",
+    "snap_rule": "formal input rows must all carry exactly the CLI SNAP identifier"
+  },
+  "scenario_aggregation": {
+    "cluster": "(rho_target, generation_seed)",
+    "within_cluster_unit": "eligible absent caregiver",
+    "rule": "arithmetic mean of paired disruption effects before any across-scenario summary",
+    "scenario_weighting": "each of the five scenarios receives equal weight regardless of its eligible-disruption count",
+    "zero_drop_definition": "U_common == 0"
+  },
+  "estimands": [
+    {
+      "id": "delta_overtime_A2_minus_A1",
+      "kind": "paired_method_difference_at_each_w4",
+      "column": "overtime",
+      "unit": "minutes",
+      "effect_direction": "A2_minus_A1; negative_favors_A2"
+    },
+    {
+      "id": "delta_deviation_A2_minus_A1",
+      "kind": "paired_method_difference_at_each_w4",
+      "column": "deviation",
+      "unit": "assignment_changes",
+      "effect_direction": "A2_minus_A1; negative_favors_A2"
+    },
+    {
+      "id": "A2_cost_of_stability",
+      "kind": "paired_endpoint_difference_within_A2",
+      "column": "overtime",
+      "w4_lo": 0,
+      "w4_hi": 100,
+      "unit": "minutes",
+      "effect_direction": "w4_hi_minus_w4_lo; positive_is_overtime_cost"
+    }
+  ],
+  "per_rho_summary": {
+    "required_scenarios": 5,
+    "statistics": ["median", "q1", "q3", "minimum", "maximum"],
+    "quantile_method": "linear",
+    "p_values": false
+  },
+  "bootstrap": {
+    "n_resamples": 10000,
+    "rng": "numpy.random.Generator(PCG64)",
+    "rng_seed": 20260730,
+    "ci_level": 0.95,
+    "resample_unit": "shared generation-seed vector",
+    "shared_seed_indices_across_rho": true,
+    "draw_rule": "draw one length-five seed-index vector per replicate and reuse it in all six rho strata",
+    "stratum_estimator": "mean of resampled scenario effects",
+    "pool_estimator": "equal-weight mean of the six rho-stratum means",
+    "interpretation": "descriptive_sensitivity_not_population_inference",
+    "pooled_p_value": false
+  },
+  "holm": {
+    "enabled_by_default": false,
+    "requires_external_preregistration_file": true,
+    "procedure": "two_sided_exact_cluster_sign_flip_then_Holm",
+    "family": "exactly the six rho levels for one registered estimand/weight cell",
+    "clusters_per_rho": 5,
+    "minimum_attainable_two_sided_p": 0.0625,
+    "adjustment": "sort raw p ascending; multiply by remaining hypotheses; cumulative maximum; cap at one",
+    "caveat": "the sign-flip exchangeability assumption is separate from the descriptive bootstrap"
+  },
+  "outputs": [
+    "r5_scenario_effects.csv",
+    "r5_by_rho.csv",
+    "r5_bootstrap.csv",
+    "r5_run_manifest.json",
+    "r5_output_hashes.json"
+  ],
+  "snap": {
+    "identifier": null,
+    "snap_binding": "cli_content_addressed_archive_sha256",
+    "formal_rule": "--formal requires --snap-id; rehearsal forbids --snap-id"
+  }
+}

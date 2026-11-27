@@ -1,0 +1,128 @@
+{
+  "stage": "R1",
+  "owner_script": "experiments/journal_p0/eps_constraint.py",
+  "written_in_round": "S2 plus exact epsilon-equivalence recovery after rejected SNAP fb0c3fa1",
+  "status": "PRE-REGISTERED RECOVERY DESIGN -- prior formal attempts rejected; the next new-SNAP R1 run is pending and no prior partial artifact is consumable",
+  "requirements": ["REQ-2", "REQ-3", "REQ-4", "REQ-5", "REQ-13"],
+  "service_level": {
+    "rule": "U_common := U_min_A1",
+    "applied_as": "equality constraint sum_q U_q == U_common in BOTH regimes",
+    "justification": "A1 pins every incumbent assignment, so A1's feasible set is contained in A2's and A2 can imitate A1; the containment is CHECKED at run time by assert_incumbent_eligible() and assert_A1_candidates_subset_A2(), not assumed",
+    "exclusions_permitted": 0,
+    "exclusion_rule_withdrawn": "rerun_plan_v2.md:427-431 (the 35 disruptions with U_min_A1 != U_min_A2 must NOT be dropped)"
+  },
+  "disruptions": {
+    "absence_rule": "all_active_future_task_holders",
+    "formal_max_absent": null,
+    "formal_coverage": "every active caregiver holding at least one task at q >= T_NOW",
+    "debug_cap_policy": "a finite --max-absent is permitted only for non-formal fixtures or rehearsals and is fatal in formal mode"
+  },
+  "epsilon": {
+    "semantics": "absolute integer budget on the summed deviation over the whole recovery horizon: sum_q D_q <= epsilon",
+    "is_per_slot_cap": false,
+    "is_fraction": false,
+    "grid_derivation": "lo = max over regimes of the minimum attainable total deviation at U_common; hi = max over regimes of the total deviation of that regime's overtime-minimising lexicographic point; grid = every integer in [lo, hi]",
+    "grid_shared_by_regimes": true,
+    "effective_budget_rule": "D=|xbar|+(n_tasks-U_common)-2|x_intersection_xbar|; effective_epsilon_is_largest_le_requested_with_that_parity",
+    "proof_anchor_policy": "solve each new effective epsilon to code-0 Optimal; reuse only fixed-parity equivalents or the already code-0 unconstrained lexicographic W-floor point, with explicit per-row provenance",
+    "feasibility_of_every_cell": "guaranteed by construction: lo is at least A1's deviation floor at U_common and A1's feasible set is contained in A2's, so no cell may be skipped and REQ-2's fail-fast rule can stand",
+    "derived_from_published_numbers": false
+  },
+  "objective": {
+    "order": ["min U", "min W subject to sum_q D_q <= epsilon", "min sum_q D_q"],
+    "implementation": "new proof anchors use separate lexicographic MILPs constrained by prior achieved values; mathematically equivalent requested-epsilon rows reuse only a code-0 anchor with explicit provenance",
+    "scalarizing_weights_used_to_emulate_the_order": false,
+    "W_definition": "total overtime minutes, recomputed as max(0, load - H_STD) per nurse per slot from the integral assignment",
+    "overtime_variable_upper_bound_rule": "H_MAX_minus_H_STD",
+    "overtime_variable_upper_bound_minutes": 120.0,
+    "rounding_before_comparison": "none"
+  },
+  "canonical_assignment": {
+    "formal_default": false,
+    "rule": "lexicographically smallest x under fixed order sorted((slot, task, nurse)), using a sequential fix-to-0-if-feasible sweep after U, W and D are fixed",
+    "disabled_semantics": "assignment_hash is empty and may not be used as cross-run reproducibility evidence",
+    "formal_policy_reason": "assignment identity is not a scientific estimand; formal R1 fixes the numerical (U,W,D) point lexicographically, disables the O(number-of-x) assignment sweep, and requires an empty assignment_hash labelled as not cross-run evidence",
+    "canonical_result_policy": "wall_time_s, node count and solver messages are diagnostics-sidecar fields and are excluded from eps_range.csv / eps_frontier.csv"
+  },
+  "independent_oracle": {
+    "module": "experiments/journal_p0/eps_oracle_independent.py",
+    "import_prohibitions": ["eps_constraint", "s2_core"],
+    "shared_data_layer": "SubgroupOptimizer.HHCPFullParser is shared and is not independently reimplemented; the incumbent CSV parser, model, constraints, objectives, grid derivation and readback are independent",
+    "grid_authority": "the oracle independently derives D_floor and D_at_Wfloor in both regimes, constructs the shared integer [max D_floor, max D_at_Wfloor] grid, and accepts no epsilon list from production",
+    "coverage": "every formal R1 (disruption, regime, epsilon) point",
+    "solver_evidence_columns": ["oracle_time_limit_s", "oracle_presolve", "oracle_effective_epsilon", "oracle_deviation_parity", "oracle_epsilon_tightened_by", "oracle_solve_anchor_epsilon", "oracle_solver_executed_for_requested_epsilon", "oracle_epsilon_solution_source", "oracle_epsilon_reuse_proof", "oracle_epsilon_equivalence_rule"],
+    "agreement": {
+      "W_absolute_tolerance": 1e-09,
+      "D": "exact",
+      "U": "exact"
+    },
+    "overtime_variable_upper_bound_rule": "H_MAX_ORACLE_minus_H_STD_ORACLE",
+    "overtime_variable_upper_bound_minutes": 120.0,
+    "lexicographic_W_row_slack": 0.0001,
+    "failure_policy": "any missing point, non-code-0 oracle solve or disagreement aborts R1; no row may be skipped"
+  },
+  "runtime_contract": {
+    "service_level_rule": "U_common=U_min_A1",
+    "service_constraint": "sum_u_eq_U_common_in_both_regimes",
+    "epsilon_semantics": "absolute_integer_sum_D_over_whole_recovery_horizon",
+    "epsilon_grid_rule": "shared_contiguous_integer_grid_from_max_regime_D_floor_to_max_regime_D_at_Wfloor",
+    "epsilon_effective_budget_rule": "D=|xbar|+(n_tasks-U_common)-2|x_intersection_xbar|; effective_epsilon_is_largest_le_requested_with_that_parity",
+    "epsilon_anchor_reuse": "code0_optimal_anchor_only; parity-equivalent and unconstrained-W-floor rows retain the complete requested integer grid with explicit proof metadata",
+    "objective_order": ["min_U", "min_W_given_U_and_epsilon", "min_D_given_U_W_and_epsilon"],
+    "integrality_tolerance": 1e-06,
+    "lexicographic_W_row_slack": 0.0001,
+    "lexicographic_W_comparison_tolerance": 1e-06,
+    "oracle_W_absolute_tolerance": 1e-09,
+    "admissible_solver_status_codes": [0],
+    "optimal_solver_status_codes": [0],
+    "solver_presolve": false,
+    "solver_time_limit_s": 1800.0,
+    "overtime_variable_upper_bound_rule": "H_MAX_minus_H_STD",
+    "overtime_variable_upper_bound_minutes": 120.0,
+    "formal_canonical_assignment": false,
+    "absence_rule": "all_active_future_task_holders",
+    "formal_max_absent": null,
+    "formal_rho_shards": [0.45, 0.55, 0.65, 0.75, 0.85, 0.95],
+    "formal_shard_merge": "validate_and_rebuild_without_resolve"
+  },
+  "shard_merge": {
+    "mode": "formal validation and rebuild only; no MILP is solved during merge",
+    "required_rhos": [0.45, 0.55, 0.65, 0.75, 0.85, 0.95],
+    "required_artifacts_per_shard": ["eps_range.csv", "eps_frontier.csv", "eps_solver_diagnostics.csv", "eps_oracle_validation.csv"],
+    "axis_authority": "rho_manifest.csv plus every referenced H_*.csv and S_*.csv; all active future-task holders are re-derived dynamically",
+    "epsilon_axis_authority": "the independently generated oracle sidecar is cross-checked against eps_range.csv and every integer frontier cell; merge does not re-solve",
+    "receipt": "r1_shard_merge_receipt.json records each accepted shard rho, row counts and current four-artifact SHA256 values plus the complete expected and actual axes; it never contains its own hash",
+    "failure_policy": "missing, duplicate or undesigned rho; mixed SNAP; missing/tampered row; stale source/H/S digest; wrong schema, service level, epsilon grid, solver status, presolve, time limit, provenance or all-active axis aborts before rebuilding"
+  },
+  "tolerances": {
+    "cap_allowance_rule": "math.ulp(cap) * 8 (s2_core.cap_fp_slack); a fixed 1e-6 is NOT an admissible final pass allowance",
+    "integrality_tolerance": 1e-06,
+    "lexicographic_row_slack": 0.0001,
+    "lexicographic_W_comparison_tolerance": 1e-06,
+    "lexicographic_row_slack_note": "The 1e-4 slack is only on the internal 'W <= W*' solver row and is NOT a cap allowance. It is strictly below the 1.0 minimum spacing of achievable W on the registered integral-duration data, so it cannot admit the next W level. Recomputed W values are still compared at 1e-6. A direct rho=.75/seed=1/absent=4 probe showed SciPy 1.13.1/HiGHS falsely returned code 2 at 1e-6 but returned the same (W=627,D=31) at 1e-4; no solver option or retry policy changed. A non-integral instance is refused unless --allow-fractional-durations is passed.",
+    "oracle_agreement": {"W": 1e-09, "D": "exact", "U": "exact"}
+  },
+  "solver": {
+    "library": "scipy.optimize.milp (HiGHS)",
+    "admissible_statuses": [{"code": 0, "name": "Optimal"}],
+    "optimal_statuses": [{"code": 0, "name": "Optimal"}],
+    "accepts_time_limit_incumbent": false,
+    "time_limit_s": 1800.0,
+    "options": {
+      "presolve": false,
+      "time_limit": 1800.0
+    },
+    "retry_policy": "none -- a failed solve aborts; it is never retried with changed options",
+    "status_name_source": "scipy.optimize.milp status code 0 is documented as 'Optimal'"
+  },
+  "prohibitions": {
+    "old_endpoint_acceptance_targets": "forbidden; no assertion may reference (126,53), (207,49), (25,1811), (25,1810), (26,1799) or the range 213",
+    "cross_stage_transcription": "the epsilon stage may not read e4_raw.csv / e4_summary.csv and the weighted-sum stage may not read eps_range.csv / eps_frontier.csv"
+  },
+  "snap": {
+    "identifier": null,
+    "snap_binding": "cli_content_addressed_archive_sha256",
+    "causal_order": "SNAP closes before R0 and before R1. The outer runner recomputes the archive SHA256 and passes it as --snap-id; embedding the archive's own hash in this in-archive manifest would be circular.",
+    "reason": "identifier is null by construction; formal R1 requires a 64-hex CLI archive SHA256 and StageOutputSpec carries that runtime value"
+  }
+}

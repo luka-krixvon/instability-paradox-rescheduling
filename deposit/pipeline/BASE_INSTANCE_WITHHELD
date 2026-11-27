@@ -1,0 +1,24 @@
+# Sources withheld from this public release.
+#
+# Each non-comment line names one manifest-declared source file that is NOT
+# redistributable and is therefore absent from this tree.  For a named file,
+# and only for a named file, the pipeline accepts the SHA-256 recorded in
+# experiments/journal_p0/rho_manifest.csv instead of recomputing it, and the
+# SNAP builder accepts its absence.  Every other input, digest, solver-status
+# and oracle gate is unchanged and still fails closed.
+#
+# The sealed run carries no such file: there, the digest below was recomputed
+# from the bytes and verified.
+#
+HHCP-patient-65-task-256-nurse-59.csv
+
+# Internal project-management and audit documents, removed from the public
+# release.  They carry private contact details, a reviewer-suggestion list, a
+# working record of co-author discussions and references to the authors'
+# internal tooling.  They are notes for an internal audit; no stage of the
+# pipeline reads any of them, and none is altered here -- they are withheld
+# whole rather than edited, so that no provenance record is published in a
+# form its author did not write.
+rerun_plan_v2_1.md
+human_decisions_required_v2_1.md
+generator_design_registration.md

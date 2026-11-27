@@ -1,0 +1,2 @@
+rho_target,seed,hhcp,sol,note
+0.0,903,H_epse4_C_precision.csv,S_epse4_C_precision.csv,precision fixture -- non-integral durations; two achievable overtime levels collide under one-decimal rounding

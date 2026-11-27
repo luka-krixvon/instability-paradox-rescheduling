@@ -1,0 +1,33 @@
+#(days),#(patients),#(nurse),#(tasks),#(nurse class),loca_x,local_y
+2,3,3,8,1,100,100
+
+# NEGATIVE CONTROL fixture.  Identical to H_epse4_A.csv EXCEPT that task 1 no
+# longer lists nurse 1 as a candidate, while the committed schedule
+# S_epse4_A.csv still assigns task 1 to nurse 1.  The incumbent is therefore
+# NOT candidate-eligible, A1's per-task candidate set {1} is NOT contained in
+# A2's {2}, and the A1-feasible-set-subset-A2 containment that justifies
+# U_common := U_min_A1 fails.  assert_incumbent_eligible() must abort on it.
+
+#(patients) in each slot
+slot 0,slot 1,slot 2,slot 3,slot 4,slot 5,
+0,1,0,0,2,2,
+
+patient,x,y,requested slot,P1_gender,P1_Weights,P2_age,P2_Weights,P3_Language,P3_Weights,P4_smoke,P4_Weights,#(tasks),task list
+0,10,10,4,0,0,0,0,0,0,0,0,4,0,1,2,3,
+1,20,20,5,0,0,0,0,0,0,0,0,3,4,5,6,
+2,30,30,1,0,0,0,0,0,0,0,0,1,7,
+
+nurse,x,y,class,P1_gender,P2_age,P3_Language,P4_smoke,#(slot),slot list,#(skills),skill list
+0,0,0,0,0,30,0,0,3,1,4,5,3,0,1,2,
+1,1,1,0,0,31,0,0,3,1,4,5,3,0,1,2,
+2,2,2,0,0,32,0,0,3,1,4,5,3,0,1,2,
+
+task,required skill,time,#(nurses),nurse list(Candidate solution)
+0,0,105,3,0,1,2,
+1,0,105,1,2,
+2,0,105,2,1,2,
+3,0,105,2,1,2,
+4,0,105,2,0,1,
+5,0,165,2,1,2,
+6,0,165,2,1,2,
+7,0,60,3,0,1,2,

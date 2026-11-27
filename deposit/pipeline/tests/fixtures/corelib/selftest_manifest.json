@@ -1,0 +1,27 @@
+{
+  "_what_this_is": "FIXTURE design manifest for the S2 corelib selftest ONLY. It is NOT a pre-registration of any R-stage design, NOT a declaration of the admissible solver-status set for R4, and NOT evidence about any published number. The status codes and names below were read from the installed scipy.optimize.milp on this machine so that the fixture exercises StageSolverPolicy; the real R4 admissible set is human decision P-H6 and must be registered by a human before any R-stage run.",
+  "_stage_naming": "The stage name deliberately does NOT begin with 'R', because a stage named R* is required by s2_core.validate_stage_output to carry a SNAP immutable version identifier. No SNAP exists this round and a SNAP identifier may never be invented.",
+  "stage": "S2-selftest-corelib",
+  "snap_id": null,
+  "solver": {
+    "library": "scipy.optimize.milp (HiGHS)",
+    "status_semantics_source": "scipy 1.13.1 res.status / res.message observed on this machine",
+    "admissible_statuses": [
+      {"code": 0, "name": "Optimal"}
+    ],
+    "optimal_statuses": [
+      {"code": 0, "name": "Optimal"}
+    ],
+    "accepts_time_limit_incumbent": false,
+    "time_limit_s": 10.0
+  },
+  "design": {
+    "allow_empty_candidate_sets": true,
+    "_allow_empty_candidate_sets_note": "The synthetic GAP ladder can leave a task whose every candidate worker was removed at the disruption (forced-unserved). That is a declared property of this construction, so an empty candidate set is not a REQ-2 abort HERE. A pipeline whose design assumes a non-empty candidate set must set this to false.",
+    "confound_control": {
+      "mode": "covariate",
+      "_note": "REQ-15 test 3 requires the confound-control choice to be declared in advance and offers exactly two options: (a) hold realized rho_avail inside a pre-registered band and fail rows outside it, or (b) persist the realized covariates and control for them in the analysis. This fixture declares (b) 'covariate'.",
+      "_why_not_band_here": "Measured on this toy, NOT tuned: at T_q=6, seed=1 the committed pack opens 2 workers and the disruption removes 1, leaving M=1, so realized rho_avail = 1.2917. Any band that a 6-8 task toy could satisfy would be so wide as to test nothing. Band mode is therefore exercised as a NEGATIVE control by band_manifest.json, which is expected to FAIL on exactly that row. No band, seed, rho, cap or tolerance was adjusted to obtain a pass."
+    }
+  }
+}

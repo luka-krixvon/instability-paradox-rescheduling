@@ -1,0 +1,6 @@
+nbServi =6;
+nbVehi =20;
+nbCust =70;
+nbSynch =30;
+e
+0 345 268 247

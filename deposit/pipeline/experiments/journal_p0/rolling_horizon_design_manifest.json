@@ -1,0 +1,48 @@
+{
+  "stage": "R3",
+  "owner_script": "experiments/journal_p0/rolling_horizon.py",
+  "status": "DESIGN REGISTERED; FORMAL RUN REQUIRES EXTERNALLY VERIFIED SNAP ARCHIVE SHA256",
+  "snap_binding": "cli_content_addressed_archive_sha256",
+  "design": {
+    "input_manifest": "rho_manifest.csv",
+    "rho_target": 0.85,
+    "absence_rule": "busiest_committed",
+    "epochs": [2, 4, 6, 8, 10],
+    "regimes": ["A1", "A2"],
+    "w4_levels": [0.0, 100.0],
+    "solver_options": {
+      "time_limit": 30.0,
+      "presolve": false,
+      "mip_rel_gap": 0.0
+    },
+    "numeric_tolerances": {
+      "solver_schedule_overtime_abs": 1e-06,
+      "capacity_allowance_rule": "math.ulp(H_MAX)*8",
+      "scope_note": "The 1e-6 bound is only for a continuous solver overtime-variable readback versus overtime recomputed from the same integral schedule. Hard-cap feasibility remains guarded by math.ulp(H_MAX)*8."
+    }
+  },
+  "solver": {
+    "library": "scipy.optimize.milp (HiGHS)",
+    "admissible_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "optimal_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "accepts_time_limit_incumbent": false,
+    "time_limit_s": 30.0,
+    "presolve": false
+  },
+  "prohibitions": {
+    "cli_shadow_defaults": true,
+    "time_limit_incumbents": true,
+    "presolve_true": true,
+    "missing_or_non_sha256_cli_snap_id": true
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "_status": "PRE-REGISTERED R4-size design; this file contains no result and authorizes no run by itself.",
+  "_snap_note": "The archive hash is deliberately not embedded in the archive. The runner must independently verify the content-addressed SNAP archive and pass its 64-hex SHA256 via --snap-id.",
+  "stage": "R4-size",
+  "snap_binding": "cli_content_addressed_archive_sha256",
+  "solver": {
+    "library": "scipy.optimize.milp (HiGHS)",
+    "status_semantics_source": "SciPy OptimizeResult.status and raw OptimizeResult.message",
+    "presolve": false,
+    "admissible_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "optimal_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "accepts_time_limit_incumbent": false,
+    "time_limit_s": 60.0
+  },
+  "design": {
+    "allow_empty_candidate_sets": false,
+    "numeric_tolerances": {
+      "solver_overtime_readback_abs": 1e-06,
+      "capacity_allowance_rule": "math.ulp(H_MAX)*8",
+      "_scope": "The 1e-6 tolerance applies only when checking the solver's continuous overtime-variable readback against a recomputed load. Physical H_MAX feasibility remains guarded only by math.ulp(H_MAX)*8."
+    },
+    "grid": {
+      "task_counts": [
+        16,
+        24,
+        32,
+        48,
+        64,
+        96,
+        128,
+        192,
+        256
+      ],
+      "seeds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "rho_commit_target": 0.74,
+      "absent_frac": 0.2,
+      "algorithms": [
+        "EXACT",
+        "VNS",
+        "ALNS",
+        "cold"
+      ],
+      "exact_repeats": 3,
+      "heuristic_repeats": 3,
+      "cold_repeats": 1
+    },
+    "confound_control": {
+      "mode": "covariate",
+      "covariates": [
+        "rho_avail",
+        "cand_degree_min",
+        "cand_degree_mean",
+        "cand_degree_max"
+      ],
+      "_analysis": "Consumers must retain block=(T_q,seed), report realized covariate ranges, and include rho_avail plus realized candidate degree in the runtime sensitivity analysis."
+    }
+  }
+}

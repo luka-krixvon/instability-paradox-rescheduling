@@ -15,9 +15,14 @@ Run identifier (`snap_id`): `d6c9fa4de2c8ca88bd2fa260f8975398ac42ed9ef14c0527213
 ## What this is, and what it is not
 
 **It is** the eight stage outputs that every reported number is computed from, the two seal
-artifacts, the run manifest, and the single script that turns them into the paper's tables,
+artifacts, the run manifest, and the script that turns them into the paper's tables,
 figures and inline numbers. Recomputation is self-contained: no solver, no MILP, no base
 instance required.
+
+**If you want to re-solve the MILPs rather than recompute from their results**, that is
+[`pipeline/`](pipeline/README.md): the model, the 30 derived scenarios, the pre-registered
+design manifests and the containerised runner, which reproduces stages R1, R1b and R5 from
+scratch. Read its README first — it states precisely which gate is relaxed there, and why.
 
 **It is not** a re-derivation of the science. Recomputing these artifacts shows the reported
 numbers follow from the recorded stage outputs. It does not independently verify the MILP
@@ -29,7 +34,10 @@ consistency checks on sealed outputs, not optimality proofs.
 research; authorisation for its use in this study and in journal submission is not in dispute,
 but no data-specific public-redistribution licence has been established for it, so it is not
 redistributed here. Stage R0 — which generates the 30 derived scenarios from that instance —
-is therefore not reproducible from this deposit. Everything from R1 onward is.
+is therefore not reproducible from either this deposit or `pipeline/`. Everything from R1
+onward is. `pipeline/` ships the 30 scenarios pre-generated and verifies each against the
+digest recorded for it, which is weaker than regenerating them and is the honest limit of
+what can be released.
 
 ---
 
@@ -37,7 +45,8 @@ is therefore not reproducible from this deposit. Everything from R1 onward is.
 
 | Path | Bytes | What it is |
 |---|---:|---|
-| `code/build_formal_results.py` | 21,150 | the only script needed; turns the stage outputs into the paper's tables, figures and `\Formal*` macros |
+| `code/build_formal_results.py` | 21,878 | the entry point; turns the stage outputs into the paper's tables, figures and `\Formal*` macros |
+| `code/figstyle.py` | 9,983 | the figure style it imports; must sit beside it. Needed only for the two figures |
 | `run/SHA256SUMS_RECOVERY_06.txt` | 20,075 | run-wide ledger (184 lines); contains all eight digests below |
 | `run/receipts/RECOVERY_06_SEAL_REPORT.json` | 26,511 | seal report for the run; `verdict: PASS` |
 | `run/results/R1/eps_range.csv` | 144,726 | per-disruption inventory (ρ, seed, absent worker, `U_common`, placeability) |
@@ -86,7 +95,7 @@ pip install numpy==2.0.2 pandas==2.3.3 scipy==1.13.1 matplotlib==3.9.4
 cd run && grep -E 'results/(R1|R1b|R5)/(eps_range|eps_frontier|eps_oracle_validation|e4_raw|e4_summary|r5_scenario_effects|r5_by_rho|r5_bootstrap)\.csv$' SHA256SUMS_RECOVERY_06.txt | shasum -a 256 -c && cd ..
 ```
 
-**2 — check the two seal artifacts** against the digests hard-coded at lines 45–48 of the script:
+**2 — check the two seal artifacts** against the digests hard-coded at lines 49–50 of the script:
 
 ```sh
 shasum -a 256 run/SHA256SUMS_RECOVERY_06.txt run/receipts/RECOVERY_06_SEAL_REPORT.json
@@ -102,13 +111,25 @@ mkdir -p out/generated out/figures
 python3 code/build_formal_results.py --results-root run/results --output-dir out/generated --figure-dir out/figures
 ```
 
-**4 — the script prints a totals block.** It must read exactly:
+**4 — the script prints a totals block** as key-sorted JSON. It must read exactly:
 
-```
-scenarios 30, disruptions 518, zero_drop 488, incumbent_flat_feasible 518, positive_u_reported 30,
-a1_inert_all 498, a1_inert_qualified 488, a1_singleton_eps_qualified 488,
-a2_responsive_all 235, a2_responsive_qualified 206, a2_multicost_eps_all 253,
-a2_multicost_eps_qualified 224, a2_strict_overtime_all 253, a2_strict_overtime_qualified 224
+```json
+{
+  "a1_inert_all": 498,
+  "a1_inert_qualified": 488,
+  "a1_singleton_eps_qualified": 488,
+  "a2_multicost_eps_all": 253,
+  "a2_multicost_eps_qualified": 224,
+  "a2_responsive_all": 235,
+  "a2_responsive_qualified": 206,
+  "a2_strict_overtime_all": 253,
+  "a2_strict_overtime_qualified": 224,
+  "disruptions": 518,
+  "incumbent_flat_feasible": 518,
+  "positive_u_reported": 30,
+  "scenarios": 30,
+  "zero_drop": 488
+}
 ```
 
 **5 — compare against the published artifacts.** `out/generated/` holds
@@ -133,9 +154,9 @@ overtime change over the same weight range, concentrated in positive-U scenarios
 
 **The bootstrap intervals are reproduced by rerunning a fixed-seed pipeline, not independently
 re-derived.** `r5_run_manifest.json` records the seed (20260730), the generator (PCG64), the
-replicate count (10,000), the shared length-5 seed-index vector per replicate and the linear
-quantile method. Rerunning reproduces the intervals; it does not constitute an independent
-statistical check of them.
+replicate count (10,000) and the shared length-5 seed-index vector per replicate; the quantile
+method is fixed in `r5_stats.py` rather than recorded in the manifest. Rerunning reproduces the
+intervals; it does not constitute an independent statistical check of them.
 
 ---
 

@@ -11,11 +11,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import sys
 from pathlib import Path
 
-import matplotlib
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import figstyle as fs           # house figure style; see its docstring for the rules
 
-matplotlib.use("Agg")
+fs.apply()                      # also selects the Agg backend
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -363,23 +366,24 @@ def plot_regime(summary: dict, figure_dir: Path) -> None:
     a1 = np.array([100 * r["a1_inert_qualified"] / r["zero_drop"] for r in by_rho])
     a2 = np.array([100 * r["a2_responsive_qualified"] / r["zero_drop"] for r in by_rho])
 
-    fig, ax = plt.subplots(figsize=(7.15, 3.55))
+    fig, ax = plt.subplots(figsize=(fs.WIDE[0], 2.95))
     width = 0.25
-    ax.bar(x - width, zero, width, label="Zero-drop qualified", color="#8DA0CB")
-    ax.bar(x, a1, width, label="A1 inert (qualified)", color="#66C2A5")
-    ax.bar(x + width, a2, width, label="A2 weight-responsive (qualified)", color="#FC8D62")
+    # tab10, with the paper's fixed semantics: orange marks the series the figure
+    # exists to point at (A2 becoming weight-responsive as capacity loosens).
+    ax.bar(x - width, zero, width, label="Zero-drop qualified", color=fs.tab_blue)
+    ax.bar(x, a1, width, label="A1 inert (qualified)", color=fs.tab_green)
+    ax.bar(x + width, a2, width, label="A2 weight-responsive (qualified)", color=fs.tab_orange)
     ax.set_xticks(x, labels)
     ax.set_xlabel(r"Target cap ratio $\rho_{target}$")
     ax.set_ylabel("Share of disruptions (%)")
-    ax.set_ylim(0, 108)
-    ax.grid(axis="y", color="#D9D9D9", linewidth=0.6)
+    ax.set_ylim(0, 105)
+    ax.grid(True)
     ax.set_axisbelow(True)
-    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.01), ncol=3,
-              fontsize=8, frameon=False)
-    fig.tight_layout()
-    for suffix in ("pdf", "png"):
-        fig.savefig(figure_dir / f"fig2_scope_responsiveness.{suffix}", dpi=300,
-                    bbox_inches="tight")
+    ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5),
+              borderaxespad=0.0)
+    fig.subplots_adjust(left=0.085, right=0.655, top=0.975, bottom=0.155)
+    fs.save(fig, figure_dir / "fig2_scope_responsiveness.pdf")
+    fig.savefig(figure_dir / "fig2_scope_responsiveness.png", dpi=300)
     plt.close(fig)
 
 
@@ -390,29 +394,32 @@ def plot_tradeoff(summary: dict, figure_dir: Path) -> None:
     require(list(dev["w4"]) == WEIGHTS, "missing deviation bootstrap weights")
     require(list(overtime["w4"]) == WEIGHTS, "missing overtime bootstrap weights")
 
-    fig, axes = plt.subplots(1, 2, figsize=(7.15, 3.05), sharex=True)
+    fig, axes = plt.subplots(1, 2, figsize=(fs.WIDE[0], 2.75), sharex=True)
+    # Both panels report the same contrast, so both carry the point-estimate colour;
+    # the zero reference is a gray dashed line, as references are throughout the paper.
     panels = [
-        (axes[0], dev, "A2 - A1 deviation", "Assignment changes", "#D95F02"),
-        (axes[1], overtime, "A2 - A1 overtime", "Minutes", "#1B9E77"),
+        (axes[0], dev, "(a) A2 \u2212 A1 deviation", "Deviation units", fs.tab_blue, "o"),
+        (axes[1], overtime, "(b) A2 \u2212 A1 overtime", "Minutes", fs.tab_blue, "s"),
     ]
-    for ax, frame, title, ylabel, color in panels:
+    for ax, frame, title, ylabel, color, marker in panels:
         x = frame["w4"].astype(float).to_numpy()
         y = frame["point"].to_numpy()
         lo = frame["ci_lo"].to_numpy()
         hi = frame["ci_hi"].to_numpy()
-        ax.fill_between(x, lo, hi, color=color, alpha=0.20, linewidth=0)
-        ax.plot(x, y, marker="o", color=color, linewidth=1.8, markersize=4)
-        ax.axhline(0, color="#555555", linewidth=0.7)
-        ax.set_title(title, fontsize=9)
+        ax.fill_between(x, lo, hi, color=color, alpha=0.20, linewidth=0,
+                        label="95% interval (descriptive)")
+        ax.plot(x, y, marker=marker, color=color, label="Point estimate")
+        ax.axhline(0, color=fs.line_gray, linewidth=0.8, linestyle=(0, (4, 2)))
+        ax.set_title(title)
         ax.set_xlabel(r"Deviation weight $w_4$")
         ax.set_ylabel(ylabel)
-        ax.grid(color="#E2E2E2", linewidth=0.55)
+        ax.grid(True)
         ax.set_axisbelow(True)
         ax.set_xticks(WEIGHTS)
-    fig.tight_layout(w_pad=1.25)
-    for suffix in ("pdf", "png"):
-        fig.savefig(figure_dir / f"fig3_weight_tradeoff.{suffix}", dpi=300,
-                    bbox_inches="tight")
+    axes[1].legend(title="Estimate", loc="center left")  # the one empty region in either panel
+    fig.subplots_adjust(left=0.085, right=0.985, top=0.905, bottom=0.165, wspace=0.30)
+    fs.save(fig, figure_dir / "fig3_weight_tradeoff.pdf")
+    fig.savefig(figure_dir / "fig3_weight_tradeoff.png", dpi=300)
     plt.close(fig)
 
 

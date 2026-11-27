@@ -1,0 +1,36 @@
+{
+  "_what_this_is": "FIXTURE manifest exercising REQ-15 confound-control mode 'band'. It is a NEGATIVE control: the S2 selftest toy realizes rho_avail = 1.2917 at T_q=6 seed=1 (M=1 available worker), so this band is EXPECTED to fail. Not a pre-registration of anything.",
+  "_stage_naming": "The stage name deliberately does NOT begin with 'R', because a stage named R* is required by s2_core.validate_stage_output to carry a SNAP immutable version identifier. No SNAP exists this round and a SNAP identifier may never be invented.",
+  "stage": "S2-selftest-corelib",
+  "snap_id": null,
+  "solver": {
+    "library": "scipy.optimize.milp (HiGHS)",
+    "status_semantics_source": "scipy 1.13.1 res.status / res.message observed on this machine",
+    "admissible_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "optimal_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "accepts_time_limit_incumbent": false,
+    "time_limit_s": 10.0
+  },
+  "design": {
+    "allow_empty_candidate_sets": true,
+    "_allow_empty_candidate_sets_note": "The synthetic GAP ladder can leave a task whose every candidate worker was removed at the disruption (forced-unserved). That is a declared property of this construction, so an empty candidate set is not a REQ-2 abort HERE. A pipeline whose design assumes a non-empty candidate set must set this to false.",
+    "confound_control": {
+      "mode": "band",
+      "rho_avail_band": [
+        0.5,
+        1.2
+      ],
+      "_note": "Expected to FAIL on the T_q=6 seed=1 row. The band was chosen BEFORE the run and not adjusted afterwards."
+    }
+  }
+}

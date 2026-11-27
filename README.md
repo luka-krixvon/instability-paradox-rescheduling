@@ -49,13 +49,15 @@ than one; raising the deviation weight from 0 to 100 costs A2 **162.12 minutes**
 instability-paradox-rescheduling/
 ├── deposit/                  # ← the paper's evidence. Sealed stage outputs + the
 │   ├── code/                 #   script that regenerates its tables and figures.
-│   └── run/results/{R1,R1b,R5}/
+│   ├── run/results/{R1,R1b,R5}/
+│   └── pipeline/             # ← the runnable model: solver code, the 30 derived
+│                             #   scenarios, containerised runner for R1/R1b/R5
 ├── demo/                     # ← GitHub Pages site, built from deposit/
 │   └── data/results.json
 ├── src/                      # EARLIER STUDY's solvers and scripts — see the note below
 ├── results/                  # EARLIER STUDY's result tables
 ├── figures/                  # EARLIER STUDY's figures
-├── data/                     # (the base instance is not redistributed; see Data)
+├── data/                     # empty (the base instance is not redistributed; see Data)
 └── requirements.txt
 ```
 
@@ -95,21 +97,42 @@ pip install -r requirements.txt
 
 ## Data
 
-**The base instance is not redistributed here.** `HHCP-patient-65-task-256-nurse-59.csv`
-(65 patients, 256 tasks, 59 nurses) derives from a co-author's earlier research.
-Authorisation for its use in this study and in journal submission is not in dispute, but no
-data-specific public-redistribution licence has been established for it, so it and its
-derived baseline schedule have been removed from this repository. Earlier commits in this
-repository's history still contain them.
+**The base instance file is not in this repository, but most of its content is.** That is an
+awkward sentence and it is the accurate one, so it goes first.
 
-This does not make the paper's computational claims uncheckable. [`deposit/`](deposit/)
-ships the sealed stage outputs that every reported number is computed from, so the Section VI
-results can be recomputed without the base instance. What cannot be reproduced from a lawful
-deposit is stage R0, which generates the derived scenarios from that instance; everything from
-R1 onward can.
+`HHCP-patient-65-task-256-nurse-59.csv` (65 patients, 256 tasks, 59 caregivers) is a
+crowdsourced home-healthcare benchmark extending a co-author's earlier work. Authorisation for
+its use in this study and in journal submission is not in dispute, but no data-specific
+public-redistribution licence has been established for it, so the file itself is not here.
 
-The MIT licence in this repository covers code written by the author. It does not and cannot
-license third-party data.
+**The 30 scenarios the study solves are released**, in
+[`deposit/pipeline/experiments/journal_p0/`](deposit/pipeline/experiments/journal_p0/): 60
+`H_rho*.csv` / `S_rho*.csv` files plus `rho_manifest.csv`, which records a SHA-256 for every
+one of them. Those scenarios are not an independent derivative of the base instance. Measured
+across all 30 files, matching rows as sets:
+
+| Block of the base instance | Recoverable from the released scenarios |
+|---|---|
+| Patient table, 65 rows | **100 %**, byte-identical |
+| Task attributes (`task`, `required skill`, `time`), 256 rows | **100 %** |
+| Caregiver table, 59 rows | **81.4 %** (48 rows, each byte-identical) |
+| Task candidate-nurse lists, 5 182 entries | **82.4 %** |
+| Candidate-solution block, 5 182 rows | **1.2 %** — the released files carry their own, re-scored |
+
+Each `S` file is a generated schedule and is not copied from anywhere. The data carries no
+names, no dates, no free text and no direct identifiers; it is synthetic, and
+[LICENSE-DATA.md](LICENSE-DATA.md) sets out the evidence for that and its limits.
+
+So the paper's computational claims can be checked two ways. [`deposit/`](deposit/) recomputes
+every reported number from the sealed stage outputs without solving anything;
+[`deposit/pipeline/`](deposit/pipeline/README.md) re-solves the MILPs of stages R1, R1b and R5
+from the released scenarios. What neither can do is regenerate the scenarios from the base
+instance — stage R0 — and `pipeline/README.md` sets out each gate that relaxes.
+
+**Licensing.** The MIT licence covers code written by the author. The 30 scenarios are released
+for **verification of this paper's results only**, not as a redistributable dataset — see
+[LICENSE-DATA.md](LICENSE-DATA.md) for what is and is not granted, and why. Neither licence
+reaches the base instance.
 
 ---
 
@@ -124,8 +147,7 @@ disruptions, 488 zero-drop, 488 singleton A1 traces and 162.12 min [151.50, 171.
 mechanism the earlier study illustrated — A1 inert to the deviation weight, A2 exposing a
 tunable frontier — does hold in the paper; the magnitudes do not. Do not cite them.
 
-Its code, tables and figures remain in `src/`, `results/` and `figures/` for the record, and
-the full earlier write-up is in this repository's history at commit `79dfdeb`.
+Its code, tables and figures remain in `src/`, `results/` and `figures/` for the record.
 
 ## What is *not* in this repository
 

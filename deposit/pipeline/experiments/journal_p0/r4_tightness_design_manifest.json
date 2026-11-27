@@ -1,0 +1,69 @@
+{
+  "_status": "PRE-REGISTERED R4-tightness design; this file contains no result and authorizes no run by itself.",
+  "_snap_note": "The archive hash is deliberately not embedded in the archive. The runner must independently verify the content-addressed SNAP archive and pass its 64-hex SHA256 via --snap-id.",
+  "stage": "R4-tightness",
+  "snap_binding": "cli_content_addressed_archive_sha256",
+  "solver": {
+    "library": "scipy.optimize.milp (HiGHS)",
+    "status_semantics_source": "SciPy OptimizeResult.status and raw OptimizeResult.message; code 1 is accepted only when the raw message explicitly says time limit and the runner independently verifies a finite feasible incumbent.",
+    "presolve": false,
+    "admissible_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      },
+      {
+        "code": 1,
+        "name": "Iteration or time limit reached"
+      }
+    ],
+    "optimal_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "accepts_time_limit_incumbent": true,
+    "time_limit_s": 30.0
+  },
+  "design": {
+    "allow_empty_candidate_sets": false,
+    "numeric_tolerances": {
+      "solver_overtime_readback_abs": 1e-06,
+      "capacity_allowance_rule": "math.ulp(H_MAX)*8",
+      "_scope": "The 1e-6 tolerance applies only when checking the solver's continuous overtime-variable readback against a recomputed load. Physical H_MAX feasibility remains guarded only by math.ulp(H_MAX)*8."
+    },
+    "grid": {
+      "task_counts": [
+        128
+      ],
+      "seeds": [
+        1,
+        2,
+        3
+      ],
+      "rho_commit_targets": [
+        0.68,
+        0.72,
+        0.76,
+        0.8,
+        0.84
+      ],
+      "absent_frac": 0.2,
+      "algorithms": [
+        "EXACT"
+      ],
+      "exact_repeats": 1
+    },
+    "confound_control": {
+      "mode": "covariate",
+      "covariates": [
+        "rho_avail",
+        "cand_degree_min",
+        "cand_degree_mean",
+        "cand_degree_max"
+      ],
+      "_analysis": "The tightness consumer must group by rho_commit_target while plotting and reporting realized rho_avail and candidate-degree covariates; code-1 rows are incumbents not proven optima."
+    }
+  }
+}

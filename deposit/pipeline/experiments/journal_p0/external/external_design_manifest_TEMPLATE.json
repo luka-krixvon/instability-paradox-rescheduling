@@ -1,0 +1,63 @@
+{
+  "stage": "R2",
+  "owner_scripts": [
+    "experiments/journal_p0/external/run_external.py",
+    "experiments/journal_p0/external/run_family.py"
+  ],
+  "registration_status": "HUMAN-BLOCKED",
+  "analysis_role": null,
+  "mode": null,
+  "snap_binding": "cli_content_addressed_archive_sha256",
+  "r0d_registration_sha256": null,
+  "design": {
+    "benchmark": null,
+    "input_path": null,
+    "input_glob": null,
+    "slots": null,
+    "rho": null,
+    "tightness_axis": {
+      "mode": null,
+      "values": null
+    },
+    "min_coverage": null,
+    "max_absent": null,
+    "absence_rule": null,
+    "on_unbuildable_task": null,
+    "dur_scale": null,
+    "w4_levels": null,
+    "solver_options": {
+      "time_limit": null,
+      "presolve": false,
+      "mip_rel_gap": null
+    }
+  },
+  "solver": {
+    "library": "scipy.optimize.milp (HiGHS)",
+    "admissible_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "optimal_statuses": [
+      {
+        "code": 0,
+        "name": "Optimal"
+      }
+    ],
+    "accepts_time_limit_incumbent": false,
+    "time_limit_s": null,
+    "presolve": false
+  },
+  "human_decisions_required": [
+    "analysis_role must be primary or sensitivity",
+    "mode must be single or family",
+    "benchmark and the exact input path/glob must be frozen",
+    "slot count, cap rho, family tightness axis, minimum coverage and max absence must be frozen",
+    "primary absence rule must be frozen; safe_filter_sensitivity may not be primary",
+    "unbuildable-task policy must be error or drop_and_record",
+    "duration scale, w4 levels and solver time limit must be frozen",
+    "R0-D registration must be signed and its SHA256 inserted",
+    "registration_status may become REGISTERED only after every field above is non-null"
+  ]
+}
